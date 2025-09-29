@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const checkoutSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -57,12 +58,20 @@ export default function CheckoutPage() {
     router.push("/order-success");
   };
 
+  useEffect(() => {
   if (items.length === 0) {
     router.push("/cart");
-    return null;
   }
+}, [items, router]);
 
+
+ if (items.length === 0) {
+  return null;
+}
+
+  
   return (
+    
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}

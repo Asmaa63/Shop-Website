@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import Header from '@/components/layout/Header';
+import Navbar from "@/components/layout/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "E-Commerce Store",
-  description: "Modern e-commerce application",
+  title: "ShopHub - Modern E-Commerce",
+  description: "Your one-stop shop for everything",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
+        <Navbar />
         {children}
         <Toaster position="top-right" richColors />
       </body>
