@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,13 @@ interface ProductCardProps {
 export default function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
   const { addItem } = useCartStore();
   const { toggleItem, isInWishlist } = useWishlistStore();
-  const isWishlisted = isInWishlist(product.id);
+  
+  const [mounted, setMounted] = useState(false); // 👈 flag
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isWishlisted = mounted ? isInWishlist(product.id) : false;
 
   const handleAddToCart = () => {
     addItem(product);
