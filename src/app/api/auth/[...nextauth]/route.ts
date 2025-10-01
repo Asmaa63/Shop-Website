@@ -1,22 +1,42 @@
+// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
+import bcrypt from "bcryptjs";
+import fs from "fs/promises";
+import path from "path";
 
-// This would come from your database
-// For now, we'll use a simple JSON file or in-memory store
+// Define User type
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  password: string;
+}
 
+// Path to users file
+const USERS_FILE = path.join(process.cwd(), "data", "users.json");
+
+// Helper function to read users
+async function getUsers(): Promise<User[]> {
+  try {
+    const data = await fs.readFile(USERS_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: "Email", type: "email", placeholder: "you@example.com" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
@@ -24,67 +44,64 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Please enter email and password");
         }
 
-        // Fetch user from your database
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/login`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-          }
+        // Get users from file
+        const users = await getUsers();
+        const user = users.find((u) => u.email === credentials.email);
+
+        if (!user) {
+          throw new Error("No user found with this email");
+        }
+
+        // Verify password
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
         );
 
-        if (!response.ok) {
-          throw new Error("Invalid email or password");
+        if (!isPasswordValid) {
+          throw new Error("Invalid password");
         }
 
-        const user = await response.json();
-
-        if (user) {
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            image: user.image,
-          };
-        }
-
-        return null;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        };
       },
     }),
   ],
+  
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  
+  session: {
+    strategy: "jwt",
+  },
+  
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
         token.name = user.name;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (session.user) {
         session.user.id = token.id as string;
-        session.user.email = token.email as string;
         session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
       return session;
     },
   },
-  pages: {
-    signIn: "/login",
-    signOut: "/",
-    error: "/login",
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
+  
   secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };

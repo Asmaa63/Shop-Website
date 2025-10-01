@@ -1,67 +1,58 @@
+// src/app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { hash } from "bcryptjs";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import bcrypt from "bcryptjs";
+import fs from "fs/promises";
+import path from "path";
 
-// Path to store users data
-const DATA_DIR = join(process.cwd(), "data");
-const USERS_FILE = join(DATA_DIR, "users.json");
-
-// Ensure data directory exists
-if (!existsSync(DATA_DIR)) {
-  mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Initialize users file if it doesn't exist
-if (!existsSync(USERS_FILE)) {
-  writeFileSync(USERS_FILE, JSON.stringify({ users: [] }, null, 2));
-}
-type User = {
+// Define User type
+interface User {
   id: string;
   name: string;
   email: string;
   password: string;
-  phone?: string;
-  avatar?: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-  };
   createdAt: string;
-  updatedAt: string;
-};
+}
 
-function getUsers(): User[] {
+// Path to store users temporarily (replace with database)
+const USERS_FILE = path.join(process.cwd(), "data", "users.json");
+
+// Helper function to read users
+async function getUsers(): Promise<User[]> {
   try {
-    const data = readFileSync(USERS_FILE, "utf-8");
-    return JSON.parse(data).users || [];
+    const data = await fs.readFile(USERS_FILE, "utf-8");
+    return JSON.parse(data);
   } catch (error) {
+    // If file doesn't exist, return empty array
     return [];
   }
 }
 
-function saveUsers(users: User[]) {
-  writeFileSync(USERS_FILE, JSON.stringify({ users }, null, 2));
+// Helper function to save users
+async function saveUsers(users: User[]): Promise<void> {
+  try {
+    // Create data directory if it doesn't exist
+    await fs.mkdir(path.join(process.cwd(), "data"), { recursive: true });
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (error) {
+    console.error("Error saving users:", error);
+    throw error;
+  }
 }
 
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, email, password, phone } = body;
+    const body = await req.json();
+    const { name, email, password } = body;
 
-    // Validation
+    // Validate input
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Name, email, and password are required" },
+        { error: "All fields are required" },
         { status: 400 }
       );
     }
 
-    // Email validation
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -70,7 +61,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Password validation
+    // Validate password length
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Password must be at least 6 characters" },
@@ -79,61 +70,52 @@ export async function POST(request: NextRequest) {
     }
 
     // Get existing users
-    const users = getUsers();
+    const users = await getUsers();
 
     // Check if user already exists
     const existingUser = users.find((u) => u.email === email);
-
     if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists with this email" },
-        { status: 409 }
+        { error: "User with this email already exists" },
+        { status: 400 }
       );
     }
 
     // Hash password
-    const hashedPassword = await hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create new user
-    const newUser = {
-      id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    const newUser: User = {
+      id: Date.now().toString(),
       name,
       email,
       password: hashedPassword,
-      phone: phone || "",
-      avatar: "",
-      address: {
-        street: "",
-        city: "",
-        state: "",
-        zip: "",
-        country: "",
-      },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
 
-    // Add user to array
+    // Add user to array and save
     users.push(newUser);
+    await saveUsers(users);
 
-    // Save to file
-    saveUsers(users);
-
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = newUser;
-
+    // Return success (without password)
     return NextResponse.json(
       {
-        message: "User registered successfully",
-        user: userWithoutPassword,
+        success: true,
+        message: "User created successfully",
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+        },
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+  { error: "Server error occurred. Please try again later." },
+  { status: 500 }
+);
+
   }
 }

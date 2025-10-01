@@ -1,281 +1,212 @@
 "use client";
 
-import { motion } from "framer-motion";
-import {
-  Package,
-  MapPin,
-  Settings,
-  Heart,
-  CreditCard,
-  Bell,
-  TrendingUp,
-  ShoppingBag,
-  Star,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Image from "next/image";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { User, Mail, Package, Settings, LogOut, ShoppingBag } from "lucide-react";
 
-const stats = [
-  { label: "Total Orders", value: "24", icon: Package, color: "from-blue-500 to-cyan-500" },
-  { label: "Wishlist Items", value: "12", icon: Heart, color: "from-pink-500 to-rose-500" },
-  { label: "Reward Points", value: "2,450", icon: Star, color: "from-yellow-500 to-orange-500" },
-  { label: "Total Spent", value: "$3,299", icon: TrendingUp, color: "from-green-500 to-emerald-500" },
-];
+export default function AccountPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("profile");
 
-const quickActions = [
-  { title: "My Orders", href: "/account/orders", icon: Package, color: "bg-blue-500" },
-  { title: "Addresses", href: "/account/addresses", icon: MapPin, color: "bg-purple-500" },
-  { title: "Wishlist", href: "/wishlist", icon: Heart, color: "bg-pink-500" },
-  { title: "Settings", href: "/account/settings", icon: Settings, color: "bg-gray-700" },
-];
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
 
-const recentOrders = [
-  {
-    id: "ORD-2024-001",
-    date: "Jan 15, 2024",
-    status: "Delivered",
-    total: "$129.99",
-    items: 3,
-    image: "/placeholder-product.jpg",
-  },
-  {
-    id: "ORD-2024-002",
-    date: "Jan 10, 2024",
-    status: "In Transit",
-    total: "$89.99",
-    items: 2,
-    image: "/placeholder-product.jpg",
-  },
-];
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
-export default function AccountOverviewPage() {
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar: "/placeholder-avatar.jpg",
-    memberSince: "Jan 2023",
+  if (!session) {
+    return null;
+  }
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Welcome Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 mb-8 text-white"
-        >
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="relative w-24 h-24 rounded-full bg-white p-1"
-            >
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-4xl">
-                👤
-              </div>
-            </motion.div>
-
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                Welcome back, {user.name}! 👋
-              </h1>
-              <p className="text-blue-100 mb-1">{user.email}</p>
-              <p className="text-sm text-blue-200">Member since {user.memberSince}</p>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-8 text-white">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
+              <User className="w-12 h-12" />
             </div>
-
-            <Button
-              variant="secondary"
-              size="lg"
-              className="rounded-full bg-white text-blue-600 hover:bg-gray-100 gap-2"
-            >
-              <Bell className="w-5 h-5" />
-              Notifications
-            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Welcome back, {session.user?.name}!</h1>
+              <p className="text-blue-100 mt-1">{session.user?.email}</p>
+            </div>
           </div>
-        </motion.div>
-
-        {/* Stats Grid */}
-        <motion.div
-          initial="hidden"
-          animate="show"
-          variants={{
-            hidden: {},
-            show: { transition: { staggerChildren: 0.1 } },
-          }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                show: { opacity: 1, y: 0 },
-              }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              className="bg-white rounded-2xl shadow-lg p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-2xl font-bold text-gray-800">{stat.value}</span>
-              </div>
-              <p className="text-gray-600 font-medium">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="lg:col-span-1"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <ShoppingBag className="w-6 h-6 text-blue-600" />
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                {quickActions.map((action, index) => (
-                  <Link key={action.title} href={action.href}>
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.4 + index * 0.1 }}
-                      whileHover={{ x: 10 }}
-                      className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all cursor-pointer group"
-                    >
-                      <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                        <action.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-800">{action.title}</p>
-                      </div>
-                      <motion.div
-                        initial={{ x: 0 }}
-                        whileHover={{ x: 5 }}
-                        className="text-gray-400"
-                      >
-                        →
-                      </motion.div>
-                    </motion.div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Recent Orders */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="lg:col-span-2"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <Package className="w-6 h-6 text-blue-600" />
-                  Recent Orders
-                </h2>
-                <Link href="/account/orders">
-                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                    View All →
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="space-y-4">
-                {recentOrders.map((order, index) => (
-                  <motion.div
-                    key={order.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    whileHover={{ scale: 1.02 }}
-                    className="border-2 border-gray-100 rounded-xl p-5 hover:border-blue-200 hover:shadow-md transition-all"
-                  >
-                    <div className="flex gap-4">
-                      <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-4xl">
-                        📦
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <p className="font-bold text-gray-800">{order.id}</p>
-                            <p className="text-sm text-gray-500">{order.date}</p>
-                          </div>
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                              order.status === "Delivered"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-blue-100 text-blue-700"
-                            }`}
-                          >
-                            {order.status}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-600">
-                            {order.items} items • {order.total}
-                          </div>
-                          <Button size="sm" variant="outline" className="rounded-lg">
-                            Track Order
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
         </div>
 
-        {/* Promotional Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 rounded-3xl p-8 text-white"
-        >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-3xl font-bold mb-2">🎉 Exclusive Member Deal!</h3>
-              <p className="text-lg text-white/90 mb-4">
-                Get 20% off on your next purchase. Use code: <span className="font-bold">MEMBER20</span>
-              </p>
-              <Link href="/shop">
-                <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 rounded-full">
-                  Shop Now
-                </Button>
-              </Link>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+              <nav className="space-y-2">
+                <button
+                  onClick={() => setActiveTab("profile")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === "profile"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <User className="w-5 h-5" />
+                  <span className="font-medium">Profile</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("orders")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === "orders"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Package className="w-5 h-5" />
+                  <span className="font-medium">Orders</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("settings")}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === "settings"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Settings className="w-5 h-5" />
+                  <span className="font-medium">Settings</span>
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              </nav>
             </div>
-            <motion.div
-              animate={{
-                y: [0, -10, 0],
-                rotate: [0, 5, -5, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="text-8xl"
-            >
-              🎁
-            </motion.div>
           </div>
-        </motion.div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {activeTab === "profile" && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Information</h2>
+                
+                <div className="space-y-6">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name
+                    </label>
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                      <User className="w-5 h-5 text-gray-400" />
+                      <span className="text-gray-900 font-medium">{session.user?.name}</span>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                      <Mail className="w-5 h-5 text-gray-400" />
+                      <span className="text-gray-900 font-medium">{session.user?.email}</span>
+                    </div>
+                  </div>
+
+                  {/* User ID */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      User ID
+                    </label>
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                      <span className="text-gray-600 font-mono text-sm">{session.user?.id}</span>
+                    </div>
+                  </div>
+
+                  {/* Edit Button */}
+                  <button className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    Edit Profile
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "orders" && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Order History</h2>
+                
+                <div className="text-center py-12">
+                  <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
+                  <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
+                  <button
+                    onClick={() => router.push("/products")}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Start Shopping
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "settings" && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h2>
+                
+                <div className="space-y-6">
+                  {/* Change Password */}
+                  <div className="pb-6 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Security</h3>
+                    <button className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                      Change Password
+                    </button>
+                  </div>
+
+                  {/* Notifications */}
+                  <div className="pb-6 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" defaultChecked />
+                        <span className="text-gray-700">Email notifications</span>
+                      </label>
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" defaultChecked />
+                        <span className="text-gray-700">Order updates</span>
+                      </label>
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" />
+                        <span className="text-gray-700">Promotional emails</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Delete Account */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Danger Zone</h3>
+                    <button className="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                      Delete Account
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

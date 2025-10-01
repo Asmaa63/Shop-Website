@@ -361,11 +361,11 @@ const {
                       </div>
                     </div>
                     <Switch
-                      checked={notifications[item.key as keyof typeof notifications]}
-                      onCheckedChange={(checked) =>
-                        setNotifications({ ...notifications, [item.key]: checked })
-                      }
-                    />
+  checked={notifications[item.key as keyof typeof notifications]}
+  onCheckedChange={(checked: boolean) =>
+    setNotifications({ ...notifications, [item.key]: checked })
+  }
+/>
                   </div>
                 ))}
               </div>
