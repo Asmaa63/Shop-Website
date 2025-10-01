@@ -2,24 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+// FIX: Importing the globally defined 'Product' interface 
+// from your types file, instead of defining it locally with id: number.
+import { Product } from '@/lib/types'; 
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;
-  category: string;
-  subcategory: string;
-  description: string;
-  inStock: boolean;
-  stockQuantity: number;
-  rating: number;
-  reviewCount: number;
-  features: string[];
-  colors: string[];
-  sizes: string[];
-}
+// Removed the local 'interface Product' definition completely.
 
 interface ProductDetailsProps {
   product: Product;
@@ -30,6 +17,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
   const [quantity, setQuantity] = useState(1);
 
+  // Ensure that 'product.originalPrice' is treated as optional if not defined in the JSON.
+  // The 'Product' interface should reflect this.
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;

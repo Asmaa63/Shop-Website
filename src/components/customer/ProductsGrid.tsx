@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import ProductCard from './ProductCard';
-import { Product, FilterOptions, SortOptions } from '@/lib/types';
+// Ensure this path is correct and points to the file where id: string is defined
+import { Product, FilterOptions, SortOptions } from '@/lib/types'; 
 import { Search, Filter, Grid, List } from 'lucide-react';
 
 interface ProductsGridProps {
@@ -21,21 +22,17 @@ export default function ProductsGrid({
   const [sortBy, setSortBy] = useState<SortOptions>({ field: 'name', direction: 'asc' });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Define allowed sort fields based on your SortOptions type
   type SortField = 'name' | 'price' | 'rating' | 'newest';
   
-  // Type guard for sort field validation
   const isSortField = (field: string): field is SortField => {
     return ['name', 'price', 'rating', 'newest'].includes(field);
   };
 
-  // Get unique categories
   const categories = useMemo(() => {
     const cats = products.map(p => p.category);
     return ['all', ...Array.from(new Set(cats))];
   }, [products]);
 
-  // Filter and sort products
   const filteredProducts = useMemo(() => {
     let filtered = products;
 
@@ -54,7 +51,6 @@ export default function ProductsGrid({
 
     // Sort products
     filtered.sort((a, b) => {
-      // استخدام Union Types بدلاً من any
       let aValue: string | number, bValue: string | number;
 
       switch (sortBy.field) {
@@ -63,12 +59,20 @@ export default function ProductsGrid({
           bValue = b.price;
           break;
         case 'rating':
-          aValue = a.rating || 0; // Handle potential undefined rating
+          aValue = a.rating || 0;
           bValue = b.rating || 0;
           break;
         case 'newest':
-          aValue = a.id; // Higher ID = newer product
-          bValue = b.id;
+          // FIX: Convert string IDs to numbers only for numerical comparison 
+          // (assuming higher ID means newer product). If IDs are complex strings, 
+          // you might need a dedicated 'createdAt' field.
+          aValue = parseInt(a.id, 10); 
+          bValue = parseInt(b.id, 10);
+          // Check if conversion failed and default to string comparison if necessary
+          if (isNaN(aValue) || isNaN(bValue)) {
+            aValue = a.id;
+            bValue = b.id;
+          }
           break;
         case 'name':
         default:
@@ -76,10 +80,15 @@ export default function ProductsGrid({
           bValue = b.name.toLowerCase();
       }
 
-      if (sortBy.direction === 'desc') {
-        return bValue > aValue ? 1 : -1;
+      // Standard comparison logic
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        const comparison = aValue.localeCompare(bValue);
+        return sortBy.direction === 'desc' ? -comparison : comparison;
       }
-      return aValue > bValue ? 1 : -1;
+
+      // Numeric comparison
+      const numericComparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      return sortBy.direction === 'desc' ? -numericComparison : numericComparison;
     });
 
     return filtered;

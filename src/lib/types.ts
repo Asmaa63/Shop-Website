@@ -1,15 +1,21 @@
 // src/lib/types.ts
 
 export interface Product {
-  id: string; // Changed from number to string
+  id: string; // Must be string
   name: string;
-  description: string;
   price: number;
+  originalPrice: number; // Must be number
   image: string;
   category: string;
-  stock: number;
-  rating?: number;
-  reviews?: number;
+  subcategory: string; // Must be string
+  description: string;
+  inStock: boolean; // Must be boolean
+  stockQuantity: number; // Must be number
+  rating: number; // Must be number
+  reviewCount: number; // Must be number
+  features: string[];
+  colors: string[];
+  sizes: string[];
 }
 
 export interface CartItem {
