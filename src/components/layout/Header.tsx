@@ -49,6 +49,11 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+  setMounted(true);
+}, []);
+
   const { getTotalItems } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
   const { user, logout } = useAuthStore();
@@ -224,11 +229,12 @@ export default function Navbar() {
                         wishlistCount > 0 ? "fill-red-500 text-red-500" : ""
                       }`}
                     />
-                    {wishlistCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
-                        {wishlistCount}
-                      </Badge>
-                    )}
+                    {/* Wishlist */}
+{mounted && wishlistCount > 0 && (
+  <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
+    {wishlistCount}
+  </Badge>
+)}
                   </Button>
                 </Link>
               </motion.div>
@@ -238,11 +244,12 @@ export default function Navbar() {
                 <Link href="/cart">
                   <Button variant="ghost" size="icon" className="relative">
                     <ShoppingCart className="w-5 h-5" />
-                    {cartItemsCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
-                        {cartItemsCount}
-                      </Badge>
-                    )}
+                    {/* Cart */}
+{mounted && cartItemsCount > 0 && (
+  <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
+    {cartItemsCount}
+  </Badge>
+)}
                   </Button>
                 </Link>
               </motion.div>

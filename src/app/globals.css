@@ -1,4 +1,8 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* لو عايزة تستخدم tailwind-animate */
 @plugin "tailwindcss-animate";
 
 body {
@@ -153,11 +157,4 @@ html {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
+

@@ -1,38 +1,22 @@
-// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+import { compare } from "bcryptjs";
 
-// Define User type
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  password: string;
-}
+// This would come from your database
+// For now, we'll use a simple JSON file or in-memory store
 
-// Temporary users array - replace with database
-const users: User[] = [
-  // Example user for testing - replace with database queries
-  // {
-  //   id: "1",
-  //   name: "Test User",
-  //   email: "test@example.com",
-  //   password: "$2a$12$hashedPasswordHere"
-  // }
-];
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "you@example.com" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
@@ -40,59 +24,67 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Please enter email and password");
         }
 
-        // TODO: Replace with actual database query
-        const user = users.find((u) => u.email === credentials.email);
-
-        if (!user) {
-          throw new Error("No user found with this email");
-        }
-
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
+        // Fetch user from your database
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/login`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          }
         );
 
-        if (!isPasswordValid) {
-          throw new Error("Invalid password");
+        if (!response.ok) {
+          throw new Error("Invalid email or password");
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
+        const user = await response.json();
+
+        if (user) {
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          };
+        }
+
+        return null;
       },
     }),
   ],
-  
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  
-  session: {
-    strategy: "jwt",
-  },
-  
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (token) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
       return session;
     },
   },
-  
+  pages: {
+    signIn: "/login",
+    signOut: "/",
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
