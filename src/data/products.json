@@ -1,7 +1,7 @@
 {
   "products": [
     {
-      "id": 1,
+      "id": "1",
       "name": "iPhone 15 Pro Max",
       "price": 1199,
       "originalPrice": 1299,
@@ -18,7 +18,7 @@
       "sizes": ["128GB", "256GB", "512GB", "1TB"]
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "MacBook Pro 14-inch",
       "price": 1999,
       "originalPrice": 2199,
@@ -35,7 +35,7 @@
       "sizes": ["512GB", "1TB", "2TB"]
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Nike Air Force 1",
       "price": 90,
       "originalPrice": 110,
@@ -52,7 +52,7 @@
       "sizes": ["7", "8", "9", "10", "11", "12"]
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "IKEA HEMNES Bed Frame",
       "price": 249,
       "originalPrice": 299,
@@ -69,7 +69,7 @@
       "sizes": ["Twin", "Full", "Queen", "King"]
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "Nike Dri-FIT Running Shirt",
       "price": 35,
       "originalPrice": 45,
@@ -86,7 +86,7 @@
       "sizes": ["XS", "S", "M", "L", "XL", "XXL"]
     },
     {
-      "id": 6,
+      "id": "6",
       "name": "Sony WH-1000XM5 Headphones",
       "price": 299,
       "originalPrice": 399,
@@ -103,7 +103,7 @@
       "sizes": ["One Size"]
     },
     {
-      "id": 7,
+      "id": "7",
       "name": "Instant Pot Duo 7-in-1",
       "price": 89,
       "originalPrice": 119,
@@ -120,7 +120,7 @@
       "sizes": ["3 Quart", "6 Quart", "8 Quart"]
     },
     {
-      "id": 8,
+      "id": "8",
       "name": "Wilson Tennis Racket Pro Staff",
       "price": 189,
       "originalPrice": 220,
@@ -137,7 +137,7 @@
       "sizes": ["4 1/8", "4 1/4", "4 3/8", "4 1/2"]
     },
     {
-      "id": 9,
+      "id": "9",
       "name": "Samsung 65\" QLED 4K TV",
       "price": 1299,
       "originalPrice": 1599,
@@ -154,7 +154,7 @@
       "sizes": ["55 inch", "65 inch", "75 inch"]
     },
     {
-      "id": 10,
+      "id": "10",
       "name": "West Elm Mid-Century Sofa",
       "price": 1299,
       "originalPrice": 1599,
@@ -171,7 +171,7 @@
       "sizes": ["76 inches", "82 inches", "96 inches"]
     },
     {
-      "id": 11,
+      "id": "11",
       "name": "Adidas Ultraboost 22 Running Shoes",
       "price": 180,
       "originalPrice": 190,
@@ -188,7 +188,7 @@
       "sizes": ["7", "8", "9", "10", "11", "12"]
     },
     {
-      "id": 12,
+      "id": "12",
       "name": "Hydro Flask Water Bottle",
       "price": 45,
       "originalPrice": 55,
@@ -205,7 +205,7 @@
       "sizes": ["18 oz", "24 oz", "32 oz", "40 oz"]
     },
     {
-      "id": 13,
+      "id": "13",
       "name": "KitchenAid Stand Mixer",
       "price": 349,
       "originalPrice": 429,
@@ -222,7 +222,7 @@
       "sizes": ["4.5 Quart", "5 Quart", "6 Quart"]
     },
     {
-      "id": 14,
+      "id": "14",
       "name": "Levi's 501 Original Jeans",
       "price": 59,
       "originalPrice": 79,
@@ -239,7 +239,7 @@
       "sizes": ["28", "30", "32", "34", "36", "38"]
     },
     {
-      "id": 15,
+      "id": "15",
       "name": "Coleman Camping Tent 4-Person",
       "price": 129,
       "originalPrice": 159,
@@ -256,7 +256,7 @@
       "sizes": ["4-Person", "6-Person", "8-Person"]
     },
     {
-      "id": 16,
+      "id": "16",
       "name": "Pottery Barn Throw Pillows Set",
       "price": 89,
       "originalPrice": 119,
@@ -273,7 +273,7 @@
       "sizes": ["18x18 inches", "20x20 inches", "22x22 inches"]
     },
     {
-      "id": 17,
+      "id": "17",
       "name": "Apple Watch Series 9",
       "price": 399,
       "originalPrice": 429,
@@ -290,7 +290,7 @@
       "sizes": ["41mm", "45mm"]
     },
     {
-      "id": 18,
+      "id": "18",
       "name": "Patagonia Houdini Jacket",
       "price": 99,
       "originalPrice": 129,
@@ -307,7 +307,7 @@
       "sizes": ["XS", "S", "M", "L", "XL", "XXL"]
     },
     {
-      "id": 19,
+      "id": "19",
       "name": "Philips Hue Smart Light Bulbs",
       "price": 199,
       "originalPrice": 249,
@@ -324,7 +324,7 @@
       "sizes": ["A19", "BR30", "GU10"]
     },
     {
-      "id": 20,
+      "id": "20",
       "name": "Under Armour Gym Shorts",
       "price": 29,
       "originalPrice": 39,
@@ -341,7 +341,7 @@
       "sizes": ["S", "M", "L", "XL", "XXL"]
     },
     {
-      "id": 21,
+      "id": "21",
       "name": "Canon EOS R6 Mark II",
       "price": 2499,
       "originalPrice": 2799,
@@ -358,7 +358,7 @@
       "sizes": ["Body Only", "24-105mm Kit"]
     },
     {
-      "id": 22,
+      "id": "22",
       "name": "Jordan 1 Retro High",
       "price": 170,
       "originalPrice": 200,
@@ -375,7 +375,7 @@
       "sizes": ["7", "8", "9", "10", "11", "12", "13"]
     },
     {
-      "id": 23,
+      "id": "23",
       "name": "Shark Robot Vacuum",
       "price": 299,
       "originalPrice": 399,
@@ -392,7 +392,7 @@
       "sizes": ["Standard"]
     },
     {
-      "id": 24,
+      "id": "24",
       "name": "YETI Cooler Tundra 45",
       "price": 325,
       "originalPrice": 375,
@@ -409,7 +409,7 @@
       "sizes": ["35 Quart", "45 Quart", "65 Quart"]
     },
     {
-      "id": 25,
+      "id": "25",
       "name": "Dyson V15 Detect Vacuum",
       "price": 749,
       "originalPrice": 849,
@@ -426,7 +426,7 @@
       "sizes": ["Standard"]
     },
     {
-      "id": 26,
+      "id": "26",
       "name": "Champion Powerblend Hoodie",
       "price": 45,
       "originalPrice": 60,
@@ -443,7 +443,7 @@
       "sizes": ["S", "M", "L", "XL", "XXL"]
     },
     {
-      "id": 27,
+      "id": "27",
       "name": "Fitbit Charge 6",
       "price": 159,
       "originalPrice": 199,
@@ -460,7 +460,7 @@
       "sizes": ["Small", "Large"]
     },
     {
-      "id": 28,
+      "id": "28",
       "name": "Weber Genesis II Gas Grill",
       "price": 899,
       "originalPrice": 1099,
@@ -477,7 +477,7 @@
       "sizes": ["3-Burner", "4-Burner", "6-Burner"]
     },
     {
-      "id": 29,
+      "id": "29",
       "name": "Lululemon Align Leggings",
       "price": 98,
       "originalPrice": 128,
@@ -494,7 +494,7 @@
       "sizes": ["2", "4", "6", "8", "10", "12", "14"]
     },
     {
-      "id": 30,
+      "id": "30",
       "name": "Nintendo Switch OLED",
       "price": 349,
       "originalPrice": 379,
