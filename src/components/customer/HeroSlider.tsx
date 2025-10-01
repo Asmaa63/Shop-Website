@@ -1,5 +1,4 @@
-'use client';
-
+"use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -91,10 +90,10 @@ export default function HeroSlider() {
               />
             </div>
 
-            {/* Content */}
-            <div className="relative z-10 h-full flex items-center">
+            {/* Content - MODIFIED FOR CENTER ALIGNMENT */}
+            <div className="relative z-10 h-full flex items-center justify-center text-center">
               <div className="max-w-7xl mx-auto px-4 w-full">
-                <div className="max-w-2xl">
+                <div className="max-w-4xl mx-auto">
                   <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-fade-in-up">
                     {slide.title}
                   </h2>

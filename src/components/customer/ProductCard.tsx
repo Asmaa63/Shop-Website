@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 
+// Local Product definition (includes discount property to fix TS error)
 interface Product {
   id: string;
   name: string;
@@ -19,7 +20,7 @@ interface Product {
   brand?: string;
   image: string;
   rating?: number;
-  discount?: number;
+  discount?: number; // Added to match usage in the component
   inStock?: boolean;
 }
 
@@ -28,16 +29,25 @@ interface ProductCardProps {
   viewMode?: "grid" | "list";
 }
 
+// Placeholder image URL
+const PLACEHOLDER_IMAGE = "https://placehold.co/400x400/dddddd/444444?text=Image+Missing";
+
 export default function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
   const { addItem } = useCartStore();
   const { toggleItem, isInWishlist } = useWishlistStore();
   
-  const [mounted, setMounted] = useState(false); // 👈 flag
+  const [mounted, setMounted] = useState(false); 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const isWishlisted = mounted ? isInWishlist(product.id) : false;
+  
+  // Determine the final image URL (real or placeholder)
+  const imageUrl = product.image && product.image.trim() !== "" 
+    ? product.image 
+    : PLACEHOLDER_IMAGE;
+
 
   const handleAddToCart = () => {
     addItem(product);
@@ -53,6 +63,9 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
     }
   };
 
+  // Calculate discount value safely
+  const discountValue = product.discount || (product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
+
   if (viewMode === "list") {
     return (
       <motion.div
@@ -60,12 +73,17 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         className="bg-white rounded-2xl shadow-lg p-6 flex gap-6 hover:shadow-xl transition-all"
       >
         <div className="relative w-32 h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-          <div className="w-full h-full flex items-center justify-center text-6xl">
-            📦
-          </div>
-          {product.discount && (
+          {/* IMAGE FIX for LIST VIEW */}
+          <Image
+            src={imageUrl}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, 33vw"
+          />
+          {discountValue > 0 && (
             <Badge className="absolute top-2 right-2 bg-red-500">
-              -{product.discount}%
+              -{discountValue}%
             </Badge>
           )}
         </div>
@@ -77,11 +95,11 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
             <div className="flex items-center gap-4 mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-blue-600">
-                  ${product.price}
+                  ${product.price.toFixed(2)}
                 </span>
                 {product.originalPrice && (
                   <span className="text-sm text-gray-400 line-through">
-                    ${product.originalPrice}
+                    ${product.originalPrice.toFixed(2)}
                   </span>
                 )}
               </div>
@@ -113,15 +131,19 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
       className="bg-white rounded-2xl shadow-lg overflow-hidden group"
     >
       <div className="relative h-64 bg-gray-100 overflow-hidden">
-        {/* Placeholder Image */}
-        <div className="w-full h-full flex items-center justify-center text-8xl">
-          📦
-        </div>
+        {/* IMAGE FIX for GRID VIEW: Use Next/Image */}
+        <Image
+          src={imageUrl}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+        />
 
         {/* Discount Badge */}
-        {product.discount && (
+        {discountValue > 0 && (
           <Badge className="absolute top-3 right-3 bg-red-500 text-white">
-            -{product.discount}%
+            -{discountValue}%
           </Badge>
         )}
 
@@ -135,7 +157,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleToggleWishlist}
-            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors ${
+            className={`z-10 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors ${
               isWishlisted
                 ? "bg-pink-600 text-white"
                 : "bg-white text-gray-800"
@@ -143,7 +165,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
           >
             <Heart className={`w-5 h-5 ${isWishlisted ? "fill-white" : ""}`} />
           </motion.button>
-          <Link href={`/product/${product.id}`}>
+          <Link href={`/product/${product.id}`} className="z-10">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -162,25 +184,25 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         </h3>
 
         {/* Rating */}
-        {product.rating && (
+        {product.rating !== undefined && (
           <div className="flex items-center gap-1 mb-3">
             {[...Array(5)].map((_, i) => (
               <span key={i} className="text-yellow-400">
                 {i < Math.floor(product.rating!) ? "⭐" : "☆"}
               </span>
             ))}
-            <span className="text-sm text-gray-600 ml-1">({product.rating})</span>
+            <span className="text-sm text-gray-600 ml-1">({product.rating.toFixed(1)})</span>
           </div>
         )}
 
         {/* Price */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl font-bold text-blue-600">
-            ${product.price}
+            ${product.price.toFixed(2)}
           </span>
           {product.originalPrice && (
             <span className="text-sm text-gray-400 line-through">
-              ${product.originalPrice}
+              ${product.originalPrice.toFixed(2)}
             </span>
           )}
         </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
@@ -15,7 +16,6 @@ import {
   LogOut,
   Settings,
   Package,
-  MapPin,
   Phone,
   Mail,
 } from "lucide-react";
@@ -31,7 +31,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
-import { useAuthStore } from "@/store/auth-store";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const categories = [
@@ -51,12 +50,14 @@ export default function Navbar() {
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
-  setMounted(true);
-}, []);
+    setMounted(true);
+  }, []);
+
+  const { data: session, status } = useSession();
+  const user = session?.user;
 
   const { getTotalItems } = useCartStore();
   const { items: wishlistItems } = useWishlistStore();
-  const { user, logout } = useAuthStore();
 
   const cartItemsCount = getTotalItems();
   const wishlistCount = wishlistItems.length;
@@ -76,11 +77,14 @@ export default function Navbar() {
     }
   };
 
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
+
   const isActive = (path: string) => pathname === path;
 
   return (
     <>
-      {/* Top Bar */}
       <div className="bg-black text-white py-2 text-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -110,7 +114,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Navbar */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -120,7 +123,6 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between gap-8">
-            {/* Logo */}
             <Link href="/">
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -136,7 +138,6 @@ export default function Navbar() {
               </motion.div>
             </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-8">
               {[
                 { name: "Home", path: "/" },
@@ -168,7 +169,6 @@ export default function Navbar() {
                 </motion.div>
               ))}
 
-              {/* Categories Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="font-medium">
@@ -188,7 +188,6 @@ export default function Navbar() {
               </DropdownMenu>
             </div>
 
-            {/* Search Bar */}
             <div className="hidden md:flex flex-1 max-w-md">
               <form onSubmit={handleSearch} className="relative w-full">
                 <Input
@@ -208,9 +207,7 @@ export default function Navbar() {
               </form>
             </div>
 
-            {/* Right Side Icons */}
             <div className="flex items-center gap-4">
-              {/* Mobile Search */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -220,7 +217,6 @@ export default function Navbar() {
                 <Search className="w-5 h-5" />
               </Button>
 
-              {/* Wishlist */}
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Link href="/wishlist">
                   <Button variant="ghost" size="icon" className="relative">
@@ -229,39 +225,37 @@ export default function Navbar() {
                         wishlistCount > 0 ? "fill-red-500 text-red-500" : ""
                       }`}
                     />
-                    {/* Wishlist */}
-{mounted && wishlistCount > 0 && (
-  <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
-    {wishlistCount}
-  </Badge>
-)}
+                    {mounted && wishlistCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
+                        {wishlistCount}
+                      </Badge>
+                    )}
                   </Button>
                 </Link>
               </motion.div>
 
-              {/* Cart */}
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Link href="/cart">
                   <Button variant="ghost" size="icon" className="relative">
                     <ShoppingCart className="w-5 h-5" />
-                    {/* Cart */}
-{mounted && cartItemsCount > 0 && (
-  <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
-    {cartItemsCount}
-  </Badge>
-)}
+                    {mounted && cartItemsCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 bg-red-500">
+                        {cartItemsCount}
+                      </Badge>
+                    )}
                   </Button>
                 </Link>
               </motion.div>
 
-              {/* User Account */}
-              {user ? (
+              {status === "loading" ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+              ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                       <Button variant="ghost" size="icon" className="relative">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                          {user.name?.charAt(0).toUpperCase() || "U"}
+                          {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || "U"}
                         </div>
                       </Button>
                     </motion.div>
@@ -291,7 +285,7 @@ export default function Navbar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-red-600 cursor-pointer">
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
                       <LogOut className="mr-2 w-4 h-4" />
                       Logout
                     </DropdownMenuItem>
@@ -306,7 +300,6 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {/* Mobile Menu */}
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="lg:hidden">
@@ -358,7 +351,6 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile Search Modal */}
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div
