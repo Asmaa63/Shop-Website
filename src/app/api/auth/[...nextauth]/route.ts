@@ -1,33 +1,14 @@
-// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import fs from "fs/promises";
-import path from "path";
 
-// Define User type
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  password: string;
-}
-
-// Path to users file
-const USERS_FILE = path.join(process.cwd(), "data", "users.json");
-
-// Helper function to read users
-async function getUsers(): Promise<User[]> {
-  try {
-    const data = await fs.readFile(USERS_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
-}
+import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
+import clientPromise from "@/lib/mongodb";
 
 export const authOptions: NextAuthOptions = {
+  adapter: MongoDBAdapter(clientPromise),
+
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -44,42 +25,38 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Please enter email and password");
         }
 
-        // Get users from file
-        const users = await getUsers();
-        const user = users.find((u) => u.email === credentials.email);
+        const client = await clientPromise;
+        const db = client.db("my-shop");
+        const usersCollection = db.collection("users");
 
+        const user = await usersCollection.findOne({ email: credentials.email });
         if (!user) {
           throw new Error("No user found with this email");
         }
 
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) {
           throw new Error("Invalid password");
         }
 
         return {
-          id: user.id,
+          id: user._id.toString(),
           email: user.email,
           name: user.name,
         };
       },
     }),
   ],
-  
+
   pages: {
     signIn: "/login",
     error: "/login",
   },
-  
+
   session: {
     strategy: "jwt",
   },
-  
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -98,7 +75,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  
+
   secret: process.env.NEXTAUTH_SECRET,
 };
 
