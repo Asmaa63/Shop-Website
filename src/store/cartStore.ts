@@ -1,29 +1,49 @@
+// File: store/cartStore.ts
+
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '@/types/index.d'; 
-
+// Assuming ShippingAddress is available somewhere, or define a basic one if not
+import type { ShippingAddress } from '@/lib/validation/checkoutSchema'; 
 
 // ----------------------------------------------------
-// 1. Define the Cart State and Actions
+// 1. Define the Order Type and EXPORT it
 // ----------------------------------------------------
 
-interface CartState {
-  items: CartItem[];
-  
-  // Actions
-  addItem: (product: Product, quantity?: number) => void;
-  // FIX: Action parameters should be the MongoDB ID, which is a string
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  
-  // Getters
-  totalItems: number;
-  totalPrice: number;
+// FIX 1: Define and Export the Order type
+export interface Order {
+    id: number; // Order ID (usually from backend, using number for temporary local ID)
+    items: CartItem[];
+    totalAmount: number;
+    orderTotal: number;
+    shippingDetails: ShippingAddress; // Use your actual ShippingAddress type
+    orderDate: string;
+    paymentMethod: 'online' | 'cod';
+    status: string;
 }
 
 // ----------------------------------------------------
-// 2. Zustand Store Implementation
+// 2. Define the Cart State and Actions
+// ----------------------------------------------------
+
+interface CartState {
+    items: CartItem[];
+    orders: Order[]; // FIX 2: Add state for user orders
+    
+    // Actions
+    addItem: (product: Product, quantity?: number) => void;
+    removeItem: (productId: string) => void;
+    updateQuantity: (productId: string, quantity: number) => void;
+    clearCart: () => void;
+    addOrder: (order: Order) => void; // FIX 3: Add action to save an order
+    
+    // Getters
+    totalItems: number;
+    totalPrice: number;
+}
+
+// ----------------------------------------------------
+// 3. Zustand Store Implementation
 // ----------------------------------------------------
 
 // Helper function to calculate totals (improves readability)
@@ -34,75 +54,90 @@ const calculateTotals = (items: CartItem[]) => {
 };
 
 export const useCartStore = create<CartState>()(
-  persist(
-    (set, get) => ({
-      items: [],
-      totalItems: 0,
-      totalPrice: 0,
+    persist(
+        (set, get) => ({
+            items: [],
+            orders: [], // FIX 4: Initialize the orders array
+            totalItems: 0,
+            totalPrice: 0,
 
-      // --- Actions Implementation ---
+            // --- Existing Actions Implementation (Unchanged logic) ---
 
-      addItem: (product, quantity = 1) => {
-        set((state) => {
-          const newItems = [...state.items]; 
-          // FIX: Use item._id and product._id
-          const itemIndex = newItems.findIndex(item => item._id === product._id);
+            addItem: (product, quantity = 1) => {
+                set((state) => {
+                    const newItems = [...state.items]; 
+                    const itemIndex = newItems.findIndex(item => item._id === product._id);
 
-          if (itemIndex > -1) {
-            newItems[itemIndex].quantity += quantity;
-          } else {
-            // New item should include the product's _id
-            newItems.push({ ...product, quantity });
-          }
+                    if (itemIndex > -1) {
+                        newItems[itemIndex].quantity += quantity;
+                    } else {
+                        newItems.push({ ...product, quantity });
+                    }
 
-          return { 
-            items: newItems, 
-            ...calculateTotals(newItems) 
-          };
-        });
-      },
+                    return { 
+                        items: newItems, 
+                        ...calculateTotals(newItems) 
+                    };
+                });
+            },
 
-      removeItem: (productId) => {
-        set((state) => {
-          // FIX: Use item._id to filter
-          const newItems = state.items.filter(item => item._id !== productId);
-          
-          return { 
-            items: newItems, 
-            ...calculateTotals(newItems) 
-          };
-        });
-      },
+            removeItem: (productId) => {
+                set((state) => {
+                    const newItems = state.items.filter(item => item._id !== productId);
+                    
+                    return { 
+                        items: newItems, 
+                        ...calculateTotals(newItems) 
+                    };
+                });
+            },
 
-      updateQuantity: (productId, quantity) => {
-        set((state) => {
-          // FIX for TypeScript error: Handle quantity <= 0 by simply removing the item in place
-          if (quantity <= 0) {
-            // FIX: Use item._id to filter
-            const newItems = state.items.filter(item => item._id !== productId);
-            return {
-                items: newItems,
-                ...calculateTotals(newItems)
-            };
-          }
+            updateQuantity: (productId, quantity) => {
+                set((state) => {
+                    if (quantity <= 0) {
+                        const newItems = state.items.filter(item => item._id !== productId);
+                        return {
+                            items: newItems,
+                            ...calculateTotals(newItems)
+                        };
+                    }
 
-          // FIX: Use item._id to map and update
-          const newItems = state.items.map(item =>
-            item._id === productId ? { ...item, quantity } : item
-          );
-          
-          return { 
-            items: newItems, 
-            ...calculateTotals(newItems) 
-          };
-        });
-      },
+                    const newItems = state.items.map(item =>
+                        item._id === productId ? { ...item, quantity } : item
+                    );
+                    
+                    return { 
+                        items: newItems, 
+                        ...calculateTotals(newItems) 
+                    };
+                });
+            },
 
-      clearCart: () => set({ items: [], totalItems: 0, totalPrice: 0 }),
-    }),
-    {
-      name: 'ecommerce-cart-storage',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
+            // --- New/Modified Actions ---
+
+            // FIX 5: Modified clearCart to also reset orders (optional, but good practice)
+            clearCart: () => set({ 
+                items: [], 
+                totalItems: 0, 
+                totalPrice: 0 
+                // We keep 'orders' here so previous orders are still visible after checkout
+            }),
+            
+            // FIX 6: Implementation of addOrder
+            addOrder: (order) => {
+                set(state => ({
+                    orders: [order, ...state.orders], // Add the new order to the beginning
+                }));
+            }
+        }),
+        {
+            name: 'ecommerce-cart-storage',
+            storage: createJSONStorage(() => localStorage),
+            // FIX 7: Include 'orders' state in persist keys
+            partialize: (state) => ({ 
+                items: state.items, 
+                orders: state.orders 
+            }),
+        }
+    )
 );
