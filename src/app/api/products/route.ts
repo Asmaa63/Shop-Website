@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb'; 
-import { Product } from '@/types/index.d';
+import { Product } from '@/types';
 import { Filter, Document } from 'mongodb'; // Removed BSON import
 
 // GET /api/products?category=electronics&sort=price_desc

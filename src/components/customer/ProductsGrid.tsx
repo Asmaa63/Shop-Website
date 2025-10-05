@@ -3,25 +3,10 @@
 import { useState, useMemo } from 'react';
 import ProductCard from './ProductCard';
 import { Search, Filter, Grid, List } from 'lucide-react';
+import { Product } from '@/lib/types';
 
 // Local definition of Product and related types to ensure type compatibility 
 // with ProductCard and resolve the Type 'Product' is missing properties error.
-interface Product {
-    id: string;
-    _id: string; 
-    name: string;
-    price: number;
-    originalPrice?: number;
-    category: string;
-    brand?: string;
-    image: string;
-    imageUrl: string;
-    rating?: number;
-    discount?: number;
-    inStock?: boolean;
-    stock: number;
-    description: string;
-}
 
 type SortField = 'name' | 'price' | 'rating' | 'newest';
 

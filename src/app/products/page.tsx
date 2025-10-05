@@ -1,24 +1,6 @@
 import ProductsGrid from '@/components/customer/ProductsGrid';
 import productsData from '@/data/products.json';
-// Removed: import { Product } from '@/lib/types'; 
-
-// Define the required Product interface locally to match ProductsGrid expectations.
-interface Product {
-    id: string;
-    _id: string; 
-    name: string;
-    price: number;
-    originalPrice?: number;
-    category: string;
-    brand?: string;
-    image: string;
-    imageUrl: string;
-    rating?: number;
-    discount?: number;
-    inStock?: boolean;
-    stock: number;
-    description: string;
-}
+import { Product } from '@/lib/types';
 
 // Define the shape of the source data item from products.json for safe access.
 interface SourceProduct {

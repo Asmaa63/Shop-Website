@@ -4,64 +4,34 @@ import CategoriesGrid from '@/components/customer/CategoriesGrid';
 import FlashDeals from '@/components/customer/FlashDeals';
 import ProductCard from '@/components/customer/ProductCard';
 import productsData from '@/data/products.json';
-
-// Define the required Product interface to match ProductCard expectations.
-interface Product {
-    id: string;
-    _id: string; 
-    name: string;
-    price: number;
-    originalPrice?: number;
-    category: string;
-    brand?: string;
-    image: string;
-    imageUrl: string;
-    rating?: number;
-    discount?: number;
-    inStock?: boolean;
-    stock: number;
-    description: string;
-}
-
-// Define the shape of the source data item from products.json for safe access.
-interface SourceProduct {
-    id: number | string;
-    name: string;
-    brand: string;
-    price: number;
-    originalPrice?: number;
-    image: string;
-    category: string;
-    subcategory: string;
-    description: string;
-    inStock: boolean;
-    stockQuantity: number;
-    colors?: string[];
-    tags?: string[];
-    features?: string[];
-    sizes?: string[];
-    rating?: number; // FIX: Added optional rating property
-}
+import { Product, RawProductData } from "@/lib/types"; 
 
 
 export default function Home() {
   // Show only first 8 products on homepage
   // Map the source data to the required Product interface
-  const featuredProducts: Product[] = (productsData.products as SourceProduct[])
-    .slice(0, 8)
-    .map(product => ({
-        ...product,
-        // Ensure id is a string
-        id: String(product.id),
-        // Add required properties that were missing or had different names
-        _id: String(product.id), // Use id as _id
-        imageUrl: product.image, // Use image as imageUrl
-        stock: product.stockQuantity, // Map stockQuantity to stock
-        // Ensure rating is present for ProductCard, defaulting to 4.0 if undefined
-        rating: product.rating || 4.0, 
-        discount: product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0,
-    } as Product));
+ const featuredProducts: Product[] = (productsData.products as RawProductData[])
+  .slice(0, 8)
+  .map(product => ({
+    ...product,
+    id: String(product.id),
+    _id: String(product.id),
+    imageUrl: product.image,
+    stock: product.stockQuantity,
+    rating: product.rating || 4.0,
+    discount: product.originalPrice
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : 0,
 
+    // ✅ إضافة الخصائص المطلوبة اللي الـ ProductCard محتاجها
+    productId: Number(product.id),
+    quantity: 1,
+    selectedColor: product.colors?.[0] || '',
+    selectedSize: product.sizes?.[0] || '',
+    slug: product.name.toLowerCase().replace(/\s+/g, '-'),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }));
 
   return (
     <>

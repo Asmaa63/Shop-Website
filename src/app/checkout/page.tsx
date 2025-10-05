@@ -76,7 +76,7 @@ export default function CheckoutPage() {
           <ul className="space-y-3">
             {items.map((item) => (
               <motion.li 
-                key={item._id} 
+                key={item._id || `${item.name}-${item.price}-${Math.random()}`} 
                 className="flex justify-between text-base"
                 variants={itemVariants}
               >

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '@/types/index.d'; 
 
+
 // ----------------------------------------------------
 // 1. Define the Cart State and Actions
 // ----------------------------------------------------

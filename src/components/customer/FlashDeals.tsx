@@ -4,30 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProductCard from './ProductCard';
 import productsData from '@/data/products.json';
+import { Product } from '@/lib/types';
 
-// Define the required Product interface to match ProductCard expectations.
-// This ensures that all required fields (_id, imageUrl, stock, etc.) are present
-// when the data is passed to ProductCard.
-interface Product {
-    id: string;
-    _id: string; 
-    name: string;
-    price: number;
-    originalPrice?: number;
-    category: string;
-    brand?: string;
-    image: string;
-    imageUrl: string;
-    rating?: number;
-    discount?: number;
-    inStock?: boolean;
-    stock: number;
-    description: string;
-}
-
-// Define the shape of the source data item from products.json for safe access.
-// FIX: Made properties that might be missing (tags, colors, etc.) optional (?)
-// to match the data structure and resolve the conversion error.
 interface SourceProduct {
     id: number | string;
     name: string;

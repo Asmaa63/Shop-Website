@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useCartStore } from '@/store/cartStore';
-import { Product } from '@/types/index.d'; 
+import { Product } from '@/types'; 
 import { Button } from '@/components/ui/button'; 
 
 // Mock Product data for demonstration (replace with actual data fetching)

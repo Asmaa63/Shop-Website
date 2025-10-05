@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Filter, Grid3x3, List, Search, SlidersHorizontal, X } from "lucide-react";
 import ProductCard from "@/components/customer/ProductCard";
+import { RawProductData } from '@/lib/types'; 
 import productsData from "@/data/products.json";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,14 +30,15 @@ export default function ShopPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    let products = [...productsData.products];
+    // 💡 FIX: استخدام RawProductData بدلاً من any[]
+    let products = [...(productsData.products as RawProductData[])]; 
 
     if (selectedCategory !== "All") {
       products = products.filter((p) => p.category === selectedCategory);
     }
 
     if (selectedBrand !== "All") {
-      products = products.filter((p) => (p as { brand?: string }).brand === selectedBrand);
+      products = products.filter((p) => p.brand === selectedBrand);
     }
 
     products = products.filter(
@@ -316,7 +318,8 @@ export default function ShopPage() {
                       : "space-y-4"
                   }
                 >
-                  {filteredProducts.map((product, index) => (
+                  {/* 💡 FIX: استخدام RawProductData بدلاً من any */}
+                  {filteredProducts.map((product: RawProductData, index: number) => (
                     <motion.div
                       key={product.id}
                       initial={{ opacity: 0, y: 30 }}
@@ -325,15 +328,28 @@ export default function ShopPage() {
                       whileHover={{ y: -5 }}
                     >
                       <ProductCard
-                        product={{
-                          ...product,
-                          id: String(product.id),
-                          _id: String(product.id),
-                          imageUrl: product.image || "",
-                          stock: product.stockQuantity || 0,
-                        }}
-                        viewMode={viewMode}
-                      />
+  product={{
+    ...product,
+    // Required fields that MUST be filled to match the Product interface:
+    productId: product.productId || Math.floor(Math.random() * 100000),
+    quantity: 1,
+    selectedColor: product.colors?.[0] || '',
+    selectedSize: product.sizes?.[0] || '',
+
+    // Other necessary fields for Product type:
+    id: String(product.id),
+    _id: String(product.id),
+    imageUrl: product.image || "",
+    stock: product.stockQuantity || 0,
+
+    // ✅ Add missing fields required by Product interface
+    slug: product.name.toLowerCase().replace(/\s+/g, '-'),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }}
+  viewMode={viewMode}
+/>
+
                     </motion.div>
                   ))}
                 </motion.div>

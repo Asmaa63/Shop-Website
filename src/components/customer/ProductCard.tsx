@@ -9,27 +9,8 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
+import { Product } from "@/lib/types";
 
-// Local Product definition, updated to include missing properties 
-// (_id, stock, description, imageUrl, etc.) required by the external types 
-// used in the stores, to minimize type conflicts.
-interface Product {
-  id: string;
-  _id: string; // Required by external store type (likely database ID)
-  name: string;
-  price: number;
-  originalPrice?: number;
-  category: string;
-  brand?: string;
-  image: string;
-  imageUrl: string; // Required by external store type
-  rating?: number;
-  discount?: number;
-  inStock?: boolean;
-  stock: number; // Required by external store type
-  description: string; // Required by external store type
-  // Three more unknown properties are likely covered by the optional properties above.
-}
 
 interface ProductCardProps {
   product: Product;
@@ -61,7 +42,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
     // FIX: Temporarily disable ESLint check for 'any' to allow build to pass 
     // due to external store type conflict.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addItem(product as any); 
+    addItem(product as any, 1); // Pass quantity 1
     toast.success(`${product.name} added to cart!`);
   };
 
@@ -77,8 +58,11 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
   };
 
   // Calculate discount value safely
-  const discountValue = product.discount || (product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0);
-
+  const discountValue = product.discount || (
+    product.originalPrice // 👈 نتحقق أولاً
+        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+        : 0
+);
   if (viewMode === "list") {
     return (
       <motion.div
@@ -111,19 +95,24 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
                   ${product.price.toFixed(2)}
                 </span>
                 {product.originalPrice && (
-                  <span className="text-sm text-gray-400 line-through">
-                    ${product.originalPrice.toFixed(2)}
-                  </span>
-                )}
+    <span className="text-sm text-gray-400 line-through">
+        ${product.originalPrice.toFixed(2)} 
+    </span>
+)}
               </div>
             </div>
           </div>
 
           <div className="flex gap-3">
-            <Button onClick={handleAddToCart} className="flex-1 gap-2">
-              <ShoppingCart className="w-4 h-4" />
-              Add to Cart
-            </Button>
+            <Button
+    onClick={handleAddToCart}
+    // إذا كانت inStock غير موجودة (undefined) نعتبرها خطأ (false)
+    disabled={!product.inStock} 
+    // إذا كانت البيانات لا تحتوي على inStock، سيتم اعتبارها false ويكون الزر معطلاً.
+    // لتجنب هذا، يمكنك استخدام: (product.inStock === false)
+>
+    Add to Cart
+</Button>
             <Button
               variant="outline"
               size="icon"
@@ -166,6 +155,16 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
           whileHover={{ opacity: 1 }}
           className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity"
         >
+          {/* FIX: Added Add to Cart button in Quick Actions (Grid View) */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleAddToCart}
+            className="z-10 w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-lg hover:bg-blue-50"
+          >
+            <ShoppingCart className="w-5 h-5" />
+          </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -220,7 +219,10 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
           )}
         </div>
 
-        {/* Add to Cart Button */}
+        {/* Add to Cart Button (Only visible on hover) - This button is now redundant 
+           because we added it to Quick Actions. You can keep it or remove it based on design choice. 
+           I will keep it here as it was in your original code, but note the one in Quick Actions 
+           is the one that will be visible when hovering on the image in Related Products. */}
         <Button
           onClick={handleAddToCart}
           className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2"
