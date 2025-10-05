@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle } from 'lucide-react'; 
+import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
@@ -20,12 +21,24 @@ export default function PaymentSuccessPage() {
         </p>
       )}
 
-      <Button onClick={() => window.location.href = '/account/orders'}>
+      <Button onClick={() => (window.location.href = '/account/orders')}>
         View Order Status
       </Button>
-      <Button variant="link" onClick={() => window.location.href = '/'} className="ml-4">
+      <Button
+        variant="link"
+        onClick={() => (window.location.href = '/')}
+        className="ml-4"
+      >
         Continue Shopping
       </Button>
     </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20">Loading...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
