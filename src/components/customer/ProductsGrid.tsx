@@ -1,10 +1,36 @@
-'use client';
+"use client";
 
 import { useState, useMemo } from 'react';
 import ProductCard from './ProductCard';
-// Ensure this path is correct and points to the file where id: string is defined
-import { Product, FilterOptions, SortOptions } from '@/lib/types'; 
 import { Search, Filter, Grid, List } from 'lucide-react';
+
+// Local definition of Product and related types to ensure type compatibility 
+// with ProductCard and resolve the Type 'Product' is missing properties error.
+interface Product {
+    id: string;
+    _id: string; 
+    name: string;
+    price: number;
+    originalPrice?: number;
+    category: string;
+    brand?: string;
+    image: string;
+    imageUrl: string;
+    rating?: number;
+    discount?: number;
+    inStock?: boolean;
+    stock: number;
+    description: string;
+}
+
+type SortField = 'name' | 'price' | 'rating' | 'newest';
+
+interface SortOptions {
+    field: SortField;
+    direction: 'asc' | 'desc';
+}
+// FilterOptions is not explicitly needed here as types are defined inline.
+
 
 interface ProductsGridProps {
   products: Product[];
@@ -21,8 +47,6 @@ export default function ProductsGrid({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState<SortOptions>({ field: 'name', direction: 'asc' });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  type SortField = 'name' | 'price' | 'rating' | 'newest';
   
   const isSortField = (field: string): field is SortField => {
     return ['name', 'price', 'rating', 'newest'].includes(field);
@@ -63,12 +87,9 @@ export default function ProductsGrid({
           bValue = b.rating || 0;
           break;
         case 'newest':
-          // FIX: Convert string IDs to numbers only for numerical comparison 
-          // (assuming higher ID means newer product). If IDs are complex strings, 
-          // you might need a dedicated 'createdAt' field.
+          // Convert string IDs to numbers for comparison (assuming higher ID means newer product).
           aValue = parseInt(a.id, 10); 
           bValue = parseInt(b.id, 10);
-          // Check if conversion failed and default to string comparison if necessary
           if (isNaN(aValue) || isNaN(bValue)) {
             aValue = a.id;
             bValue = b.id;
@@ -200,7 +221,7 @@ export default function ProductsGrid({
             : 'grid-cols-1'
         }`}>
           {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} viewMode={viewMode} />
           ))}
         </div>
       )}

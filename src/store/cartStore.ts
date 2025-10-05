@@ -1,75 +1,107 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { CartItem, Product } from '@/types/index.d'; 
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  quantity: number;
-}
+// ----------------------------------------------------
+// 1. Define the Cart State and Actions
+// ----------------------------------------------------
 
-interface CartStore {
+interface CartState {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  
+  // Actions
+  addItem: (product: Product, quantity?: number) => void;
+  // FIX: Action parameters should be the MongoDB ID, which is a string
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  getTotalItems: () => number;
-  getTotalPrice: () => number;
+  
+  // Getters
+  totalItems: number;
+  totalPrice: number;
 }
 
-export const useCartStore = create<CartStore>()(
+// ----------------------------------------------------
+// 2. Zustand Store Implementation
+// ----------------------------------------------------
+
+// Helper function to calculate totals (improves readability)
+const calculateTotals = (items: CartItem[]) => {
+    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return { totalItems, totalPrice };
+};
+
+export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      totalItems: 0,
+      totalPrice: 0,
 
-      addItem: (item) => {
-        const items = get().items;
-        const existingItem = items.find((i) => i.id === item.id);
+      // --- Actions Implementation ---
 
-        if (existingItem) {
-          set({
-            items: items.map((i) =>
-              i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-            ),
-          });
-        } else {
-          set({ items: [...items, { ...item, quantity: 1 }] });
-        }
-      },
+      addItem: (product, quantity = 1) => {
+        set((state) => {
+          const newItems = [...state.items]; 
+          // FIX: Use item._id and product._id
+          const itemIndex = newItems.findIndex(item => item._id === product._id);
 
-      removeItem: (id) => {
-        set({ items: get().items.filter((item) => item.id !== id) });
-      },
+          if (itemIndex > -1) {
+            newItems[itemIndex].quantity += quantity;
+          } else {
+            // New item should include the product's _id
+            newItems.push({ ...product, quantity });
+          }
 
-      updateQuantity: (id, quantity) => {
-        if (quantity < 1) return;
-        set({
-          items: get().items.map((item) =>
-            item.id === id ? { ...item, quantity } : item
-          ),
+          return { 
+            items: newItems, 
+            ...calculateTotals(newItems) 
+          };
         });
       },
 
-      clearCart: () => {
-        set({ items: [] });
+      removeItem: (productId) => {
+        set((state) => {
+          // FIX: Use item._id to filter
+          const newItems = state.items.filter(item => item._id !== productId);
+          
+          return { 
+            items: newItems, 
+            ...calculateTotals(newItems) 
+          };
+        });
       },
 
-      getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
+      updateQuantity: (productId, quantity) => {
+        set((state) => {
+          // FIX for TypeScript error: Handle quantity <= 0 by simply removing the item in place
+          if (quantity <= 0) {
+            // FIX: Use item._id to filter
+            const newItems = state.items.filter(item => item._id !== productId);
+            return {
+                items: newItems,
+                ...calculateTotals(newItems)
+            };
+          }
+
+          // FIX: Use item._id to map and update
+          const newItems = state.items.map(item =>
+            item._id === productId ? { ...item, quantity } : item
+          );
+          
+          return { 
+            items: newItems, 
+            ...calculateTotals(newItems) 
+          };
+        });
       },
 
-      getTotalPrice: () => {
-        return get().items.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        );
-      },
+      clearCart: () => set({ items: [], totalItems: 0, totalPrice: 0 }),
     }),
     {
-      name: 'cart-storage',
+      name: 'ecommerce-cart-storage',
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

@@ -31,30 +31,24 @@ export default function ShopPage() {
   const filteredProducts = useMemo(() => {
     let products = [...productsData.products];
 
-    // Filter by category
     if (selectedCategory !== "All") {
       products = products.filter((p) => p.category === selectedCategory);
     }
 
-    // Filter by brand
     if (selectedBrand !== "All") {
-  products = products.filter((p) => (p as { brand?: string }).brand === selectedBrand);
-}
+      products = products.filter((p) => (p as { brand?: string }).brand === selectedBrand);
+    }
 
-
-    // Filter by price range
     products = products.filter(
       (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
     );
 
-    // Filter by search
     if (searchQuery) {
       products = products.filter((p) =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Sort products
     switch (sortBy) {
       case "low-high":
         products.sort((a, b) => a.price - b.price);
@@ -84,7 +78,6 @@ export default function ShopPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,7 +102,6 @@ export default function ShopPage() {
           </motion.p>
         </motion.div>
 
-        {/* Search Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -137,7 +129,6 @@ export default function ShopPage() {
         </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters - Desktop */}
           <motion.aside
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -160,7 +151,6 @@ export default function ShopPage() {
                 </Button>
               </div>
 
-              {/* Categories */}
               <div className="mb-6">
                 <h3 className="font-semibold mb-3 text-gray-700">Categories</h3>
                 <div className="space-y-2">
@@ -182,7 +172,6 @@ export default function ShopPage() {
                 </div>
               </div>
 
-              {/* Brands */}
               <div className="mb-6">
                 <h3 className="font-semibold mb-3 text-gray-700">Brands</h3>
                 <div className="space-y-2">
@@ -204,7 +193,6 @@ export default function ShopPage() {
                 </div>
               </div>
 
-              {/* Price Range */}
               <div>
                 <h3 className="font-semibold mb-3 text-gray-700">Price Range</h3>
                 <Slider
@@ -222,7 +210,6 @@ export default function ShopPage() {
             </div>
           </motion.aside>
 
-          {/* Mobile Filter Button */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -236,7 +223,6 @@ export default function ShopPage() {
             </Button>
           </motion.div>
 
-          {/* Mobile Filters Modal */}
           <AnimatePresence>
             {showFilters && (
               <motion.div
@@ -264,15 +250,12 @@ export default function ShopPage() {
                       <X className="w-5 h-5" />
                     </Button>
                   </div>
-                  {/* Same filter content as sidebar */}
                 </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Products Section */}
           <div className="flex-1">
-            {/* Toolbar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -286,7 +269,6 @@ export default function ShopPage() {
               </div>
 
               <div className="flex items-center gap-4">
-                {/* View Mode Toggle */}
                 <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                   <Button
                     variant={viewMode === "grid" ? "default" : "ghost"}
@@ -306,12 +288,11 @@ export default function ShopPage() {
                   </Button>
                 </div>
 
-                {/* Sort */}
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px] rounded-lg">
+                  <SelectTrigger className="w-[180px] rounded-lg ">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="default">Default</SelectItem>
                     <SelectItem value="low-high">Price: Low to High</SelectItem>
                     <SelectItem value="high-low">Price: High to Low</SelectItem>
@@ -322,7 +303,6 @@ export default function ShopPage() {
               </div>
             </motion.div>
 
-            {/* Products Grid/List */}
             <AnimatePresence mode="wait">
               {filteredProducts.length > 0 ? (
                 <motion.div
@@ -344,7 +324,16 @@ export default function ShopPage() {
                       transition={{ delay: index * 0.05, duration: 0.4 }}
                       whileHover={{ y: -5 }}
                     >
-                     <ProductCard product={{ ...product, id: String(product.id) }} viewMode={viewMode} />
+                      <ProductCard
+                        product={{
+                          ...product,
+                          id: String(product.id),
+                          _id: String(product.id),
+                          imageUrl: product.image || "",
+                          stock: product.stockQuantity || 0,
+                        }}
+                        viewMode={viewMode}
+                      />
                     </motion.div>
                   ))}
                 </motion.div>

@@ -5,9 +5,63 @@ import FlashDeals from '@/components/customer/FlashDeals';
 import ProductCard from '@/components/customer/ProductCard';
 import productsData from '@/data/products.json';
 
+// Define the required Product interface to match ProductCard expectations.
+interface Product {
+    id: string;
+    _id: string; 
+    name: string;
+    price: number;
+    originalPrice?: number;
+    category: string;
+    brand?: string;
+    image: string;
+    imageUrl: string;
+    rating?: number;
+    discount?: number;
+    inStock?: boolean;
+    stock: number;
+    description: string;
+}
+
+// Define the shape of the source data item from products.json for safe access.
+interface SourceProduct {
+    id: number | string;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice?: number;
+    image: string;
+    category: string;
+    subcategory: string;
+    description: string;
+    inStock: boolean;
+    stockQuantity: number;
+    colors?: string[];
+    tags?: string[];
+    features?: string[];
+    sizes?: string[];
+    rating?: number; // FIX: Added optional rating property
+}
+
+
 export default function Home() {
   // Show only first 8 products on homepage
-  const featuredProducts = productsData.products.slice(0, 8);
+  // Map the source data to the required Product interface
+  const featuredProducts: Product[] = (productsData.products as SourceProduct[])
+    .slice(0, 8)
+    .map(product => ({
+        ...product,
+        // Ensure id is a string
+        id: String(product.id),
+        // Add required properties that were missing or had different names
+        _id: String(product.id), // Use id as _id
+        imageUrl: product.image, // Use image as imageUrl
+        stock: product.stockQuantity, // Map stockQuantity to stock
+        // Ensure rating is present for ProductCard, defaulting to 4.0 if undefined
+        rating: product.rating || 4.0, 
+        discount: product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0,
+    } as Product));
+
 
   return (
     <>
@@ -41,8 +95,8 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {featuredProducts.map(product => (
-  <ProductCard key={String(product.id)} product={{ ...product, id: String(product.id) }} />
-))}
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
           </div>
 

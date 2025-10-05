@@ -6,6 +6,12 @@ This is a modern, full-stack **E-commerce Platform** built for high performance 
 
 It is designed as a scalable solution for a dynamic online shop, ready to handle product listings, user accounts, and secure transactions.
 
+---
+
+**🚀 Live Demo:** [https://shop-website-bay.vercel.app/](https://shop-website-bay.vercel.app/)
+
+---
+
 ## ✨ Key Features
 
 * **Full User Authentication:** Secure sign-up, login, and session management using **NextAuth.js**.
@@ -15,6 +21,10 @@ It is designed as a scalable solution for a dynamic online shop, ready to handle
 * **Modern UI/UX:** Built with **Tailwind CSS** and **Shadcn UI** primitives for a clean, responsive, and accessible interface.
 * **Animated Interactions:** Enhanced user experience with fluid animations powered by **Framer Motion**.
 * **Transaction/User Feedback:** Toast notifications and alerts managed by **Sonner**.
+
+## 📁 Project Structure
+
+The project follows the standard Next.js App Router structure, enhanced with dedicated directories for components, services, and state management logic.
 
 ## 📁 Project Structure
 

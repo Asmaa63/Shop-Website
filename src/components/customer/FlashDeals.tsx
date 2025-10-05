@@ -1,9 +1,51 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProductCard from './ProductCard';
 import productsData from '@/data/products.json';
+
+// Define the required Product interface to match ProductCard expectations.
+// This ensures that all required fields (_id, imageUrl, stock, etc.) are present
+// when the data is passed to ProductCard.
+interface Product {
+    id: string;
+    _id: string; 
+    name: string;
+    price: number;
+    originalPrice?: number;
+    category: string;
+    brand?: string;
+    image: string;
+    imageUrl: string;
+    rating?: number;
+    discount?: number;
+    inStock?: boolean;
+    stock: number;
+    description: string;
+}
+
+// Define the shape of the source data item from products.json for safe access.
+// FIX: Made properties that might be missing (tags, colors, etc.) optional (?)
+// to match the data structure and resolve the conversion error.
+interface SourceProduct {
+    id: number | string;
+    name: string;
+    brand: string;
+    price: number;
+    originalPrice?: number;
+    image: string;
+    category: string;
+    subcategory: string;
+    description: string;
+    inStock: boolean;
+    stockQuantity: number;
+    colors?: string[];
+    tags?: string[];
+    features?: string[];
+    sizes?: string[];
+}
+
 
 export default function FlashDeals() {
   const [timeLeft, setTimeLeft] = useState({
@@ -36,10 +78,25 @@ export default function FlashDeals() {
     return () => clearInterval(interval);
   }, []);
 
-  // Get first 4 products with discount
-  const flashDeals = productsData.products
+  // Get first 4 products with discount and transform them to match the ProductCard's required interface
+  const flashDeals = (productsData.products as SourceProduct[])
     .filter(p => p.originalPrice)
-    .slice(0, 4);
+    .slice(0, 4)
+    .map(product => ({
+        // Map common properties
+        ...product,
+        // Ensure id is a string
+        id: String(product.id),
+        
+        // Add required properties that were missing or had different names
+        _id: String(product.id), // Use id as _id
+        imageUrl: product.image, // Use image as imageUrl
+        stock: product.stockQuantity, // Map stockQuantity to stock
+        
+        // Calculate dynamic properties
+        rating: 4.5, // Default rating for display purposes
+        discount: product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0,
+    } as Product)); // Assert the final transformed type to Product
 
   return (
     <div className="py-16 bg-white">
@@ -78,8 +135,8 @@ export default function FlashDeals() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {flashDeals.map(product => (
-  <ProductCard key={String(product.id)} product={{ ...product, id: String(product.id) }} />
-))}
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
 
         {/* View All Button */}
