@@ -4,38 +4,35 @@ import RelatedProducts from "@/components/customer/RelatedProducts";
 import productsData from "@/data/products.json";
 import { Product, RawProductData, ProductsDataFile } from "@/lib/types";
 
-// 1️⃣ Cast JSON data safely
 const data = productsData as unknown as ProductsDataFile;
-
-// 2️⃣ Extract raw products
 const rawProducts: RawProductData[] = data.products;
 
-// 3️⃣ Map raw data to Product interface, adding defaults for required fields
 const products: Product[] = rawProducts.map((p) => ({
   ...p,
-
   productId: p.productId || (typeof p.id === "number" ? p.id : Math.floor(Math.random() * 100000)),
   quantity: 1,
   selectedColor: p.colors?.[0] || "",
   selectedSize: p.sizes?.[0] || "",
-
   id: String(p.id),
   _id: String(p.id),
   imageUrl: p.image || "",
   stock: p.stockQuantity || 0,
-
-  // ✅ Add missing fields required by Product type
   slug: p.name?.toLowerCase().replace(/\s+/g, "-") || `product-${p.id}`,
   createdAt: new Date(),
   updatedAt: new Date(),
 }));
 
-export default async function ProductPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+export function generateStaticParams() {
+  return products.map((p) => ({
+    id: p.id,
+  }));
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FixedPageProps = Record<string, any>;
+
+export default async function ProductPage({ params }: FixedPageProps) {
+  const id = params?.id?.toString?.() ?? "";
 
   const product = products.find((p) => p.id === id);
 
