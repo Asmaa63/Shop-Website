@@ -144,7 +144,7 @@ export default function ProductsGrid({
             {/* Sort */}
             <div>
               <select
-                value={`${sortBy.field}-${sortBy.direction}`}
+                value={`EGP{sortBy.field}-EGP{sortBy.direction}`}
                 onChange={(e) => {
                   const [field, direction] = e.target.value.split('-');
                   if (isSortField(field)) {
@@ -169,7 +169,7 @@ export default function ProductsGrid({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-smooth ${
+                className={`p-2 rounded-lg transition-smooth EGP{
                   viewMode === 'grid' 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -179,7 +179,7 @@ export default function ProductsGrid({
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-smooth ${
+                className={`p-2 rounded-lg transition-smooth EGP{
                   viewMode === 'list' 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -200,7 +200,7 @@ export default function ProductsGrid({
           <p className="text-gray-600">Try adjusting your search or filter criteria</p>
         </div>
       ) : (
-        <div className={`grid gap-6 ${
+        <div className={`grid gap-6 EGP{
           viewMode === 'grid' 
             ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
             : 'grid-cols-1'

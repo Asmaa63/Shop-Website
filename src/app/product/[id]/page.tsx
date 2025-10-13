@@ -17,7 +17,7 @@ const products: Product[] = rawProducts.map((p) => ({
   _id: String(p.id),
   imageUrl: p.image || "",
   stock: p.stockQuantity || 0,
-  slug: p.name?.toLowerCase().replace(/\s+/g, "-") || `product-${p.id}`,
+  slug: p.name?.toLowerCase().replace(/\s+/g, "-") || `product-EGP{p.id}`,
   createdAt: new Date(),
   updatedAt: new Date(),
 }));

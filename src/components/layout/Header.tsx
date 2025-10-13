@@ -84,7 +84,7 @@ export default function Navbar() {
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (searchQuery.trim()) {
-			window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}`;
+			window.location.href = `/shop?search=EGP{encodeURIComponent(searchQuery)}`;
 		}
 	};
 
@@ -114,11 +114,11 @@ export default function Navbar() {
 						<div className="flex items-center gap-6">
 							<div className="flex items-center gap-2">
 								<Phone className="w-4 h-4" />
-								<span className="hidden sm:inline">+1 234 567 890</span>
+								<span className="hidden sm:inline">+20 1065307167</span>
 							</div>
 							<div className="flex items-center gap-2">
 								<Mail className="w-4 h-4" />
-								<span className="hidden lg:inline">support@exclusive.com</span>
+								<span className="hidden lg:inline">support@exclusive.com.eg</span>
 							</div>
 						</div>
 					</div>
@@ -164,7 +164,7 @@ export default function Navbar() {
 								>
 									<Link
 										href={link.path}
-										className={`relative font-medium transition-colors hover:text-red-500 ${
+										className={`relative font-medium transition-colors hover:text-red-500 EGP{
 											isActive(link.path) ? "text-red-500" : "text-gray-700"
 										}`}
 									>
@@ -232,7 +232,7 @@ export default function Navbar() {
 								<Link href="/wishlist">
 									<Button variant="ghost" size="icon" className="relative">
 										<Heart
-											className={`w-5 h-5 ${
+											className={`w-5 h-5 EGP{
 												wishlistCount > 0 ? "fill-red-500 text-red-500" : ""
 											}`}
 										/>
@@ -332,7 +332,7 @@ export default function Navbar() {
 												key={link.path}
 												href={link.path}
 												onClick={() => setIsMobileMenuOpen(false)}
-												className={`block py-3 px-4 rounded-lg font-medium transition-colors ${
+												className={`block py-3 px-4 rounded-lg font-medium transition-colors EGP{
 													isActive(link.path)
 														? "bg-red-500 text-white"
 														: "hover:bg-gray-100"

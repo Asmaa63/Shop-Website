@@ -163,14 +163,14 @@ export default function AddressesPage() {
                   }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   whileHover={{ y: -5 }}
-                  className={`bg-white rounded-2xl shadow-lg p-6 ${
+                  className={`bg-white rounded-2xl shadow-lg p-6 EGP{
                     address.isDefault ? "ring-2 ring-blue-500" : ""
                   }`}
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 rounded-xl ${addressTypeConfig[address.type].color} flex items-center justify-center`}>
+                      <div className={`w-12 h-12 rounded-xl EGP{addressTypeConfig[address.type].color} flex items-center justify-center`}>
                         <TypeIcon className="w-6 h-6" />
                       </div>
                       <div>
@@ -279,7 +279,7 @@ export default function AddressesPage() {
                     return (
                       <label
                         key={type}
-                        className={`flex-1 flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                        className={`flex-1 flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all EGP{
                           formData.type === type
                             ? "border-blue-500 bg-blue-50"
                             : "border-gray-200 hover:border-gray-300"

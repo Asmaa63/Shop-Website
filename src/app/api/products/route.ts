@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
     
     if (minPrice || maxPrice) {
         filter.price = filter.price || {};
-        const priceFilter = filter.price as { $gte?: number, $lte?: number };
+        const priceFilter = filter.price as { EGPgte?: number, EGPlte?: number };
         
-        if (minPrice) priceFilter.$gte = parseFloat(minPrice);
-        if (maxPrice) priceFilter.$lte = parseFloat(maxPrice);
+        if (minPrice) priceFilter.EGPgte = parseFloat(minPrice);
+        if (maxPrice) priceFilter.EGPlte = parseFloat(maxPrice);
     }
 
     if (search) {
@@ -37,13 +37,13 @@ export async function GET(request: NextRequest) {
         const regexFilter = new RegExp(search, 'i');
         
         const orConditions: Document[] = [
-            { name: { $regex: regexFilter } },
-            { description: { $regex: regexFilter } }
+            { name: { EGPregex: regexFilter } },
+            { description: { EGPregex: regexFilter } }
         ];
 
-        // FIX 2: Using bracket notation to set $or dynamically, bypassing the complex type checking
+        // FIX 2: Using bracket notation to set EGPor dynamically, bypassing the complex type checking
         // This is a common pattern to avoid 'as any' on the filter object itself.
-        filter['$or'] = orConditions; 
+        filter['EGPor'] = orConditions; 
     }
     
     // --- 2. Sorting Logic ---

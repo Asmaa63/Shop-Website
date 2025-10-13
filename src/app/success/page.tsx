@@ -36,7 +36,7 @@ function PaymentSuccessContent() {
             
             try {
                 // IMPORTANT: Call your backend API to verify the payment using the sessionId.
-                const response = await fetch(`/api/payment/confirm?sessionId=${sessionId}`, {
+                const response = await fetch(`/api/payment/confirm?sessionId=EGP{sessionId}`, {
                     method: 'POST',
                 });
                 const result = await response.json();
@@ -53,7 +53,7 @@ function PaymentSuccessContent() {
                     toast.success('Order finalized and cart cleared!');
 
                     // Redirect to the dedicated confirmation page after store update
-                    router.replace(`/order-confirmation?orderId=${result.order.id}`);
+                    router.replace(`/order-confirmation?orderId=EGP{result.order.id}`);
 
                 } else {
                     setVerificationStatus('failed');

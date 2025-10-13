@@ -43,7 +43,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
     // due to external store type conflict.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addItem(product as any, 1); // Pass quantity 1
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`EGP{product.name} added to cart!`);
   };
 
   const handleToggleWishlist = () => {
@@ -92,11 +92,11 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
             <div className="flex items-center gap-4 mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-blue-600">
-                  ${product.price.toFixed(2)}
+                  EGP{product.price.toFixed(2)}
                 </span>
                 {product.originalPrice && (
     <span className="text-sm text-gray-400 line-through">
-        ${product.originalPrice.toFixed(2)} 
+        EGP{product.originalPrice.toFixed(2)} 
     </span>
 )}
               </div>
@@ -106,10 +106,8 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
           <div className="flex gap-3">
             <Button
     onClick={handleAddToCart}
-    // إذا كانت inStock غير موجودة (undefined) نعتبرها خطأ (false)
+    
     disabled={!product.inStock} 
-    // إذا كانت البيانات لا تحتوي على inStock، سيتم اعتبارها false ويكون الزر معطلاً.
-    // لتجنب هذا، يمكنك استخدام: (product.inStock === false)
 >
     Add to Cart
 </Button>
@@ -119,7 +117,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
               onClick={handleToggleWishlist}
               className={isWishlisted ? "text-pink-600 border-pink-600" : ""}
             >
-              <Heart className={`w-4 h-4 ${isWishlisted ? "fill-pink-600" : ""}`} />
+              <Heart className={`w-4 h-4 EGP{isWishlisted ? "fill-pink-600" : ""}`} />
             </Button>
           </div>
         </div>
@@ -169,15 +167,15 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleToggleWishlist}
-            className={`z-10 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors ${
+            className={`z-10 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors EGP{
               isWishlisted
                 ? "bg-pink-600 text-white"
                 : "bg-white text-gray-800"
             }`}
           >
-            <Heart className={`w-5 h-5 ${isWishlisted ? "fill-white" : ""}`} />
+            <Heart className={`w-5 h-5 EGP{isWishlisted ? "fill-white" : ""}`} />
           </motion.button>
-          <Link href={`/product/${product.id}`} className="z-10">
+          <Link href={`/product/EGP{product.id}`} className="z-10">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -210,11 +208,11 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         {/* Price */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl font-bold text-blue-600">
-            ${product.price.toFixed(2)}
+            EGP{product.price.toFixed(2)}
           </span>
           {product.originalPrice && (
             <span className="text-sm text-gray-400 line-through">
-              ${product.originalPrice.toFixed(2)}
+              EGP{product.originalPrice.toFixed(2)}
             </span>
           )}
         </div>
@@ -225,7 +223,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
            is the one that will be visible when hovering on the image in Related Products. */}
         <Button
           onClick={handleAddToCart}
-          className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2"
+          className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2 text-white"
         >
           <ShoppingCart className="w-4 h-4" />
           Add to Cart

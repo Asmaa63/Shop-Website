@@ -166,10 +166,10 @@ export default function CartPage() {
                         {/* Price */}
                         <div className="text-right">
                           <p className="text-2xl font-bold text-blue-600">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            EGP{(item.price * item.quantity).toFixed(2)}
                           </p>
                           <p className="text-sm text-gray-500">
-                            ${item.price} each
+                            EGP{item.price} each
                           </p>
                         </div>
                       </div>
@@ -243,7 +243,7 @@ export default function CartPage() {
               <div className="space-y-3 mb-6 pb-6 border-b">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>EGP{subtotal.toFixed(2)}</span>
                 </div>
                 {appliedCoupon && (
                   <motion.div
@@ -252,16 +252,16 @@ export default function CartPage() {
                     className="flex justify-between text-green-600"
                   >
                     <span>Discount (10%)</span>
-                    <span>-${discount.toFixed(2)}</span>
+                    <span>-EGP{discount.toFixed(2)}</span>
                   </motion.div>
                 )}
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? "FREE" : `EGPEGP{shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (8%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>EGP{tax.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -269,7 +269,7 @@ export default function CartPage() {
               <div className="flex justify-between items-center mb-6">
                 <span className="text-xl font-bold">Total</span>
                 <span className="text-3xl font-bold text-blue-600">
-                  ${total.toFixed(2)}
+                  EGP{total.toFixed(2)}
                 </span>
               </div>
 
@@ -277,7 +277,7 @@ export default function CartPage() {
               <Link href="/checkout">
                 <Button
                   size="lg"
-                  className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2"
+                  className="w-full rounded-xl bg-gradient-to-r text-white from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2"
                 >
                   Proceed to Checkout
                   <ArrowRight className="w-5 h-5" />
@@ -297,7 +297,7 @@ export default function CartPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-6 p-4 bg-blue-50 rounded-xl text-sm text-blue-800"
                 >
-                  💡 Add ${(100 - subtotal).toFixed(2)} more to get FREE shipping!
+                  💡 Add EGP{(100 - subtotal).toFixed(2)} more to get FREE shipping!
                 </motion.div>
               )}
             </div>

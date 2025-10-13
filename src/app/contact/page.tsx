@@ -14,7 +14,9 @@ import { useToast } from "@/components/ui/use-toast";
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z
+    .string()
+    .regex(/^(\+20|0)?1[0-9]{9}EGP/, "Invalid Egyptian phone number"),
   subject: z.string().min(5, "Subject must be at least 5 characters"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
@@ -25,32 +27,32 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Call Us",
-    details: ["+1 (234) 567-8900", "+1 (234) 567-8901"],
+    details: ["+20 1065307167", "+20 1145678910"],
     color: "bg-red-100 text-red-600",
   },
   {
     icon: Mail,
     title: "Email Us",
-    details: ["support@exclusive.com", "info@exclusive.com"],
+    details: ["support@exclusive.com.eg", "info@exclusive.com.eg"],
     color: "bg-blue-100 text-blue-600",
   },
   {
     icon: MapPin,
     title: "Visit Us",
-    details: ["123 Commerce Street", "New York, NY 10001"],
+    details: ["5th Settlement, New Cairo", "Cairo, Egypt"],
     color: "bg-green-100 text-green-600",
   },
   {
     icon: Clock,
     title: "Working Hours",
-    details: ["Mon - Fri: 9:00 AM - 6:00 PM", "Sat - Sun: 10:00 AM - 4:00 PM"],
+    details: ["Mon - Fri: 9:00 AM - 6:00 PM", "Sat: 10:00 AM - 4:00 PM"],
     color: "bg-purple-100 text-purple-600",
   },
 ];
 
 export default function ContactPage() {
   const { toast } = useToast();
-  
+
   const {
     register,
     handleSubmit,
@@ -62,7 +64,6 @@ export default function ContactPage() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      // Send contact form data to API
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,7 +78,7 @@ export default function ContactPage() {
       });
 
       reset();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
@@ -88,7 +89,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -103,7 +103,6 @@ export default function ContactPage() {
         </motion.div>
       </div>
 
-      {/* Header */}
       <section className="container mx-auto px-4 py-16">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -120,7 +119,6 @@ export default function ContactPage() {
           </p>
         </motion.div>
 
-        {/* Contact Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {contactInfo.map((info, index) => (
             <motion.div
@@ -134,7 +132,7 @@ export default function ContactPage() {
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 360 }}
                 transition={{ duration: 0.5 }}
-                className={`w-16 h-16 rounded-full ${info.color} flex items-center justify-center mb-4 mx-auto`}
+                className={`w-16 h-16 rounded-full EGP{info.color} flex items-center justify-center mb-4 mx-auto`}
               >
                 <info.icon className="w-8 h-8" />
               </motion.div>
@@ -148,9 +146,7 @@ export default function ContactPage() {
           ))}
         </div>
 
-        {/* Contact Form & Map */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Form */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -164,11 +160,7 @@ export default function ContactPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <Input
-                  {...register("name")}
-                  placeholder="Your Name"
-                  className="h-12"
-                />
+                <Input {...register("name")} placeholder="Your Name" className="h-12" />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
                 )}
@@ -200,11 +192,7 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <Input
-                  {...register("subject")}
-                  placeholder="Subject"
-                  className="h-12"
-                />
+                <Input {...register("subject")} placeholder="Subject" className="h-12" />
                 {errors.subject && (
                   <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>
                 )}
@@ -241,26 +229,24 @@ export default function ContactPage() {
             </form>
           </motion.div>
 
-          {/* Map & Additional Info */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-6"
           >
-            {/* Map */}
             <div className="bg-white rounded-3xl overflow-hidden shadow-lg h-96">
-              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">Interactive Map</p>
-                  <p className="text-sm text-gray-500">Google Maps integration</p>
-                </div>
-              </div>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.913723479766!2d31.482212874648787!3d30.04344351837485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1458159b8ef4bfbf%3A0xfed341ca6b3d4d2c!2sNew%20Cairo%2C%20Cairo%2C%20Egypt!5e0!3m2!1sen!2seg!4v1696600000000!5m2!1sen!2seg"
+                width="100%"
+                height="100%"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
 
-            {/* FAQ Quick Links */}
-            <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-3xl p-8">
+            {/* <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-3xl p-8">
               <h3 className="text-2xl font-bold mb-4">Quick Links</h3>
               <div className="space-y-3">
                 {[
@@ -287,12 +273,11 @@ export default function ContactPage() {
                   </motion.div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </section>
 
-      {/* Social Media Section */}
       <section className="bg-gradient-to-r from-red-500 to-pink-500 py-16">
         <div className="container mx-auto px-4 text-center text-white">
           <motion.div
@@ -309,7 +294,7 @@ export default function ContactPage() {
                 (social, index) => (
                   <motion.a
                     key={social}
-                    href={`#${social}`}
+                    href={`#EGP{social}`}
                     initial={{ opacity: 0, scale: 0 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}

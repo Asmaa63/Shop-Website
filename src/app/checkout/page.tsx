@@ -83,12 +83,12 @@ export default function CheckoutPage() {
                     <ul className="space-y-3">
                         {items.map((item) => (
                             <motion.li 
-                                key={item._id || `${item.name}-${item.price}-${Math.random()}`} 
+                                key={item._id || `EGP{item.name}-EGP{item.price}-EGP{Math.random()}`} 
                                 className="flex justify-between text-base"
                                 variants={itemVariants}
                             >
                                 <span className="text-gray-600 truncate mr-2">{item.name} (x{item.quantity})</span>
-                                <span className="font-semibold text-gray-800">${(item.price * item.quantity).toFixed(2)}</span>
+                                <span className="font-semibold text-gray-800">EGP{(item.price * item.quantity).toFixed(2)}</span>
                             </motion.li>
                         ))}
                     </ul>
@@ -98,12 +98,12 @@ export default function CheckoutPage() {
                     <div className="space-y-2">
                         <div className="flex justify-between text-lg font-medium">
                             <span>Subtotal:</span>
-                            <span>${totalPrice.toFixed(2)}</span>
+                            <span>EGP{totalPrice.toFixed(2)}</span>
                         </div>
                         
                         <div className="flex justify-between text-base text-gray-600">
                             <span>Shipping:</span>
-                            <span>${shippingCost.toFixed(2)}</span>
+                            <span>EGP{shippingCost.toFixed(2)}</span>
                         </div>
                     </div>
                     
@@ -115,7 +115,7 @@ export default function CheckoutPage() {
                         transition={{ type: "spring", stiffness: 300 }}
                     >
                         <span>Order Total:</span>
-                        <span>${orderTotal.toFixed(2)}</span>
+                        <span>EGP{orderTotal.toFixed(2)}</span>
                     </motion.div>
                     
                 </motion.div>

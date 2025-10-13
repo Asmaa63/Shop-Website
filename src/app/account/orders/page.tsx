@@ -164,7 +164,7 @@ export default function OrdersPage() {
                                                     <p className="text-sm text-gray-500">{orderDate}</p>
                                                 </div>
                                                 <Badge
-                                                    className={`${config.color} border-2 px-4 py-2 text-sm font-semibold flex items-center gap-2`}
+                                                    className={`EGP{config.color} border-2 px-4 py-2 text-sm font-semibold flex items-center gap-2`}
                                                 >
                                                     <StatusIcon className="w-4 h-4" />
                                                     {config.label}
@@ -185,7 +185,7 @@ export default function OrdersPage() {
                                                             {item.name} × {item.quantity}
                                                         </span>
                                                         <span className="font-semibold">
-                                                            ${item.price.toFixed(2)}
+                                                            EGP{item.price.toFixed(2)}
                                                         </span>
                                                     </div>
                                                 ))}
@@ -198,7 +198,7 @@ export default function OrdersPage() {
                                             <div className="flex items-center justify-between pt-4 border-t">
                                                 <span className="text-gray-600 font-medium">Order Total</span>
                                                 <span className="text-2xl font-bold text-blue-600">
-                                                    ${orderTotal}
+                                                    EGP{orderTotal}
                                                 </span>
                                             </div>
                                         </div>
@@ -240,7 +240,7 @@ export default function OrdersPage() {
 
                 {/* Order Details Modal */}
                 <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gray-500">
                         <DialogHeader>
                             <DialogTitle className="text-2xl">Order Details</DialogTitle>
                         </DialogHeader>
@@ -288,7 +288,7 @@ export default function OrdersPage() {
                                                     <p className="font-semibold">{item.name}</p>
                                                     <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                                                 </div>
-                                                <p className="font-bold">${item.price.toFixed(2)}</p>
+                                                <p className="font-bold">EGP{item.price.toFixed(2)}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -298,7 +298,7 @@ export default function OrdersPage() {
                                     <div className="flex justify-between text-xl font-bold">
                                         <span>Total</span>
                                         <span className="text-blue-600">
-                                            ${selectedOrder.orderTotal.toFixed(2)}
+                                            EGP{selectedOrder.orderTotal.toFixed(2)}
                                         </span>
                                     </div>
                                 </div>

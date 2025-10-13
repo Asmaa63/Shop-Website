@@ -134,7 +134,7 @@ export default function Footer() {
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`text-gray-400 transition-colors duration-300 transform hover:scale-125 ${social.color}`}
+                className={`text-gray-400 transition-colors duration-300 transform hover:scale-125 EGP{social.color}`}
                 aria-label={social.href.split('.').at(-2)}
               >
                 <social.icon className="w-6 h-6" />

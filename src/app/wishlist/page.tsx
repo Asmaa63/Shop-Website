@@ -17,7 +17,7 @@ export default function WishlistPage() {
 const moveToCart = (product: any) => {
   addItem(product);
   removeItem(product.id);
-  toast.success(`${product.name} added to cart!`);
+  toast.success(`EGP{product.name} added to cart!`);
 };
 
   const shareWishlist = () => {
@@ -210,11 +210,11 @@ const moveToCart = (product: any) => {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <span className="text-2xl font-bold text-blue-600">
-                        ${item.price}
+                        EGP{item.price}
                       </span>
                       {item.originalPrice && (
                         <span className="text-sm text-gray-400 line-through ml-2">
-                          ${item.originalPrice}
+                          EGP{item.originalPrice}
                         </span>
                       )}
                     </div>

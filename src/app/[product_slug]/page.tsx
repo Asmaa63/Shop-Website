@@ -31,7 +31,7 @@ export default function ProductDetailPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold">{mockProduct.name}</h1>
-      <p className="text-xl text-gray-700">${mockProduct.price.toFixed(2)}</p>
+      <p className="text-xl text-gray-700">EGP{mockProduct.price.toFixed(2)}</p>
       
       <div className="mt-6">
         <Button 

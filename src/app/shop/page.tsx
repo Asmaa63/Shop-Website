@@ -17,20 +17,19 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 
-const categories = ["All", "Electronics", "Fashion", "Accessories", "Home", "Sports"];
-const brands = ["All", "Nike", "Adidas", "Apple", "Samsung", "Zara"];
+const categories = ["All", "Electronics", "Fashion", "Home & Garden", "Sports & Outdoors"];
+const brands = ["All", "Nike", "Adidas", "Apple", "Samsung", "Sony", "IKEA"];
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [sortBy, setSortBy] = useState("default");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFiltersDialog, setShowFiltersDialog] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    // 💡 FIX: استخدام RawProductData بدلاً من any[]
     let products = [...(productsData.products as RawProductData[])]; 
 
     if (selectedCategory !== "All") {
@@ -72,42 +71,98 @@ export default function ShopPage() {
   const clearFilters = () => {
     setSelectedCategory("All");
     setSelectedBrand("All");
-    setPriceRange([0, 1000]);
+    setPriceRange([0, 10000]);
     setSearchQuery("");
     setSortBy("default");
   };
 
+  // Filters Panel Component
+  const FiltersPanel = ({ isMobile = false }) => (
+    <div className={isMobile ? "space-y-6" : "space-y-6"}>
+      {/* Categories */}
+      <div>
+        <h3 className="font-bold mb-3 text-blue-700">Categories</h3>
+        <div className="space-y-2">
+          {categories.map((cat) => (
+            <motion.button
+              key={cat}
+              whileHover={{ scale: 1.02, x: 5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedCategory(cat)}
+              className={`block w-full text-left px-4 py-2.5 rounded-xl transition-all ${
+                selectedCategory === cat
+                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold"
+                  : "bg-gray-50 hover:bg-gray-200 text-gray-700"
+              }`}
+            >
+              {cat}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Brands */}
+      <div>
+        <h3 className="font-bold mb-3 text-purple-700">Brands</h3>
+        <div className="space-y-2">
+          {brands.map((brand) => (
+            <motion.button
+              key={brand}
+              whileHover={{ scale: 1.02, x: 5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedBrand(brand)}
+              className={`block w-full text-left px-4 py-2.5 rounded-xl transition-all ${
+                selectedBrand === brand
+                  ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold"
+                  : "bg-gray-50 hover:bg-gray-200 text-gray-700"
+              }`}
+            >
+              {brand}
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h3 className="font-bold mb-3 text-blue-700">Price Range</h3>
+        <Slider
+          value={priceRange}
+          onValueChange={setPriceRange}
+          max={10000}
+          step={50}
+        />
+        <div className="flex justify-between text-sm text-gray-700 font-medium mt-3">
+          <span>EGP {priceRange[0]}</span>
+          <span>EGP {priceRange[1]}</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-8 md:mb-12"
         >
-          <motion.h1
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3"
-          >
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
             Discover Amazing Products
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-600 text-lg max-w-2xl mx-auto"
-          >
+          </h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Explore our curated collection of premium products
-          </motion.p>
+          </p>
         </motion.div>
 
+        {/* Search Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
           className="mb-8"
         >
           <div className="relative max-w-2xl mx-auto">
@@ -117,7 +172,7 @@ export default function ShopPage() {
               placeholder="Search for products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-4 py-6 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-500 transition-all shadow-sm"
+              className="pl-12 pr-10 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 transition-all"
             />
             {searchQuery && (
               <button
@@ -130,14 +185,16 @@ export default function ShopPage() {
           </div>
         </motion.div>
 
+        {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-8">
+          {/* Desktop Sidebar - Hidden on mobile */}
           <motion.aside
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="hidden lg:block w-72 space-y-6"
+            transition={{ delay: 0.3 }}
+            className="hidden lg:block w-72"
           >
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5" />
@@ -152,116 +209,17 @@ export default function ShopPage() {
                   Clear All
                 </Button>
               </div>
-
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-gray-700">Categories</h3>
-                <div className="space-y-2">
-                  {categories.map((cat) => (
-                    <motion.button
-                      key={cat}
-                      whileHover={{ scale: 1.02, x: 5 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`block w-full text-left px-4 py-2.5 rounded-xl transition-all ${
-                        selectedCategory === cat
-                          ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md"
-                          : "bg-gray-50 hover:bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {cat}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-gray-700">Brands</h3>
-                <div className="space-y-2">
-                  {brands.map((brand) => (
-                    <motion.button
-                      key={brand}
-                      whileHover={{ scale: 1.02, x: 5 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setSelectedBrand(brand)}
-                      className={`block w-full text-left px-4 py-2.5 rounded-xl transition-all ${
-                        selectedBrand === brand
-                          ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-md"
-                          : "bg-gray-50 hover:bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {brand}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-3 text-gray-700">Price Range</h3>
-                <Slider
-                  value={priceRange}
-                  onValueChange={setPriceRange}
-                  max={1000}
-                  step={10}
-                  className="mb-4"
-                />
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
-                </div>
-              </div>
+              <FiltersPanel />
             </div>
           </motion.aside>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="lg:hidden fixed bottom-6 right-6 z-50"
-          >
-            <Button
-              onClick={() => setShowFilters(!showFilters)}
-              className="rounded-full w-14 h-14 shadow-2xl bg-gradient-to-r from-blue-600 to-purple-600"
-            >
-              <Filter className="w-6 h-6" />
-            </Button>
-          </motion.div>
-
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
-                onClick={() => setShowFilters(false)}
-              >
-                <motion.div
-                  initial={{ x: "100%" }}
-                  animate={{ x: 0 }}
-                  exit={{ x: "100%" }}
-                  transition={{ type: "spring", damping: 25 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl overflow-y-auto p-6"
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold">Filters</h2>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowFilters(false)}
-                    >
-                      <X className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
+          {/* Products Section */}
           <div className="flex-1">
+            {/* Controls Bar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.3 }}
               className="bg-white rounded-2xl shadow-md p-4 mb-6 flex flex-wrap items-center justify-between gap-4"
             >
               <div className="flex items-center gap-2">
@@ -270,7 +228,17 @@ export default function ShopPage() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
+                {/* Filters Button - Mobile Only */}
+                <Button
+                  onClick={() => setShowFiltersDialog(true)}
+                  className="lg:hidden gap-2 bg-gradient-to-r from-blue-600 to-purple-600"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  Filters
+                </Button>
+
+                {/* View Mode */}
                 <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                   <Button
                     variant={viewMode === "grid" ? "default" : "ghost"}
@@ -290,8 +258,9 @@ export default function ShopPage() {
                   </Button>
                 </div>
 
+                {/* Sort */}
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px] rounded-lg ">
+                  <SelectTrigger className="w-[180px] rounded-lg">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
@@ -305,6 +274,7 @@ export default function ShopPage() {
               </div>
             </motion.div>
 
+            {/* Products Grid/List */}
             <AnimatePresence mode="wait">
               {filteredProducts.length > 0 ? (
                 <motion.div
@@ -318,38 +288,31 @@ export default function ShopPage() {
                       : "space-y-4"
                   }
                 >
-                  {/* 💡 FIX: استخدام RawProductData بدلاً من any */}
                   {filteredProducts.map((product: RawProductData, index: number) => (
                     <motion.div
                       key={product.id}
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05, duration: 0.4 }}
+                      transition={{ delay: index * 0.05 }}
                       whileHover={{ y: -5 }}
                     >
                       <ProductCard
-  product={{
-    ...product,
-    // Required fields that MUST be filled to match the Product interface:
-    productId: product.productId || Math.floor(Math.random() * 100000),
-    quantity: 1,
-    selectedColor: product.colors?.[0] || '',
-    selectedSize: product.sizes?.[0] || '',
-
-    // Other necessary fields for Product type:
-    id: String(product.id),
-    _id: String(product.id),
-    imageUrl: product.image || "",
-    stock: product.stockQuantity || 0,
-
-    // ✅ Add missing fields required by Product interface
-    slug: product.name.toLowerCase().replace(/\s+/g, '-'),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }}
-  viewMode={viewMode}
-/>
-
+                        product={{
+                          ...product,
+                          productId: product.productId || Math.floor(Math.random() * 100000),
+                          quantity: 1,
+                          selectedColor: product.colors?.[0] || '',
+                          selectedSize: product.sizes?.[0] || '',
+                          id: String(product.id),
+                          _id: String(product.id),
+                          imageUrl: product.image || "",
+                          stock: product.stockQuantity || 0,
+                          slug: product.name.toLowerCase().replace(/\s+/g, '-'),
+                          createdAt: new Date(),
+                          updatedAt: new Date(),
+                        }}
+                        viewMode={viewMode}
+                      />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -373,6 +336,63 @@ export default function ShopPage() {
           </div>
         </div>
       </div>
+
+      {/* Filters Dialog - Mobile */}
+      <AnimatePresence>
+        {showFiltersDialog && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowFiltersDialog(false)}
+              className="fixed inset-0 bg-black/50 z-40"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-96 max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+            >
+              {/* Dialog Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <SlidersHorizontal className="w-5 h-5" />
+                  Filters
+                </h2>
+                <button
+                  onClick={() => setShowFiltersDialog(false)}
+                  className="text-white hover:bg-white/20 p-1 rounded-lg transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Dialog Content */}
+              <div className="overflow-y-auto max-h-[calc(85vh-140px)] px-6 py-4">
+                <FiltersPanel isMobile={true} />
+              </div>
+
+              {/* Dialog Footer */}
+              <div className="border-t p-4 flex gap-2 sticky bottom-0 bg-gray-50">
+                <button
+                  onClick={clearFilters}
+                  className="flex-1 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-all font-semibold"
+                >
+                  Clear All
+                </button>
+                <button
+                  onClick={() => setShowFiltersDialog(false)}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+                >
+                  Apply
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

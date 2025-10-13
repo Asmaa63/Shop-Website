@@ -96,7 +96,7 @@ export default function Home() {
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-xl shadow-lg hover-lift transition-smooth text-center border border-green-100">
               <div className="text-5xl mb-4">🚚</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Free Shipping</h3>
-              <p className="text-gray-600">Free shipping on orders over $50</p>
+              <p className="text-gray-600">Free shipping on orders over EGP 500</p>
             </div>
 
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-xl shadow-lg hover-lift transition-smooth text-center border border-blue-100">

@@ -41,7 +41,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     addItem(productWithSelections as any, quantity);
 
     toast.success(
-      `${quantity} x ${product.name} (${selectedColor || "N/A"}, ${
+      `EGP{quantity} x EGP{product.name} (EGP{selectedColor || "N/A"}, EGP{
         selectedSize || "N/A"
       }) added to cart!`
     );
@@ -91,7 +91,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               {[...Array(5)].map((_, i) => (
                 <span
                   key={i}
-                  className={`text-lg ${
+                  className={`text-lg EGP{
                     i < Math.floor(product.rating ?? 0)
                       ? "text-yellow-400"
                       : "text-gray-300"
@@ -109,12 +109,12 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
           <div className="flex items-center gap-4">
             <span className="text-3xl font-bold text-gray-900">
-              ${product.price}
+              EGP{product.price}
             </span>
             {product.originalPrice && (
               <>
                 <span className="text-xl text-gray-500 line-through">
-                  ${product.originalPrice}
+                  EGP{product.originalPrice}
                 </span>
                 <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-sm font-semibold">
                   Save {discount}%
@@ -125,17 +125,17 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
           <div className="flex items-center gap-2">
             <div
-              className={`w-3 h-3 rounded-full ${
+              className={`w-3 h-3 rounded-full EGP{
                 product.inStock ? "bg-green-500" : "bg-red-500"
               }`}
             ></div>
             <span
-              className={`font-medium ${
+              className={`font-medium EGP{
                 product.inStock ? "text-green-700" : "text-red-700"
               }`}
             >
               {product.inStock
-                ? `In Stock (${stockAvailable} available)`
+                ? `In Stock (EGP{stockAvailable} available)`
                 : "Out of Stock"}
             </span>
           </div>
@@ -175,7 +175,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 rounded-lg border transition-all ${
+                    className={`px-4 py-2 rounded-lg border transition-all EGP{
                       selectedColor === color
                         ? "border-blue-600 bg-blue-50 text-blue-700"
                         : "border-gray-300 hover:border-gray-400"
@@ -198,7 +198,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-lg border transition-all ${
+                    className={`px-4 py-2 rounded-lg border transition-all EGP{
                       selectedSize === size
                         ? "border-blue-600 bg-blue-50 text-blue-700"
                         : "border-gray-300 hover:border-gray-400"
@@ -233,7 +233,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 </button>
               </div>
               <span className="text-gray-600">
-                Total: ${(product.price * quantity).toFixed(2)}
+                Total: EGP{(product.price * quantity).toFixed(2)}
               </span>
             </div>
           </div>

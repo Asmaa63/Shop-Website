@@ -97,7 +97,6 @@ export default function CategoriesGrid() {
 
                 {/* Hover Arrow */}
                 <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="text-2xl">→</span>
                 </div>
               </div>
             </Link>

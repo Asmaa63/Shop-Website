@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         product_data: {
           name: item.name,
           images: [item.imageUrl],
-          description: `Product ID: ${item._id}`, // Use _id here
+          description: `Product ID: EGP{item._id}`, // Use _id here
         },
         unit_amount: Math.round(item.price * 100),
       },
@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
 
     // --- 2. Calculate dynamic URLs for redirection ---
     const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000';
-    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/checkout?cancelled=true`;
+    const successUrl = `EGP{baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `EGP{baseUrl}/checkout?cancelled=true`;
 
     // --- 3. Create Stripe Checkout Session ---
     const session = await stripe.checkout.sessions.create({

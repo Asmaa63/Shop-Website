@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
         errorMessage = (err as { message: string }).message;
     }
     
-    console.error(`Webhook signature verification failed: ${errorMessage}`);
-    return new NextResponse(`Webhook Error: ${errorMessage}`, { status: 400 });
+    console.error(`Webhook signature verification failed: EGP{errorMessage}`);
+    return new NextResponse(`Webhook Error: EGP{errorMessage}`, { status: 400 });
   }
 
   // 3. Handle the event
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       // 5. Save the Order to MongoDB
       await orderCollection.insertOne(newOrder as Order);
       
-      console.log(`Order created successfully for session: ${session.id}`);
+      console.log(`Order created successfully for session: EGP{session.id}`);
 
     } catch (dbError) {
       console.error('Database Error during order creation:', dbError);

@@ -54,7 +54,7 @@ const services = [
   {
     icon: "🚚",
     title: "FREE AND FAST DELIVERY",
-    description: "Free delivery for all orders over $140",
+    description: "Free delivery for all orders over EGP 340",
   },
   {
     icon: "🎧",
@@ -153,7 +153,7 @@ export default function AboutPage() {
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: 360 }}
                   transition={{ duration: 0.5 }}
-                  className={`w-16 h-16 rounded-full ${stat.color} flex items-center justify-center mb-4`}
+                  className={`w-16 h-16 rounded-full EGP{stat.color} flex items-center justify-center mb-4`}
                 >
                   <stat.icon className="w-8 h-8" />
                 </motion.div>
@@ -207,7 +207,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
-      <section className="container mx-auto px-4 py-20">
+      {/* <section className="container mx-auto px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -273,7 +273,7 @@ export default function AboutPage() {
             </motion.div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Services Section */}
       <section className="bg-gradient-to-br from-gray-50 to-white py-20">

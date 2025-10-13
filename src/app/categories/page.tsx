@@ -52,7 +52,7 @@ export default function CategoriesPage() {
                 {cat.subcategories.map((sub) => (
                   <li key={sub}>
                     <Link
-                      href={`/shop?category=${cat.id}&subcategory=${sub}`}
+                      href={`/shop?category=EGP{cat.id}&subcategory=EGP{sub}`}
                       className="text-gray-600 hover:text-blue-600 transition"
                     >
                       {sub}

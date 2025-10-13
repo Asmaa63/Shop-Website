@@ -12,7 +12,7 @@ export const ShippingAddressSchema = z.object({
   country: z.string().min(2, "Country is required.").max(50),
   phone: z
     .string()
-    .regex(/^[0-9]+$/, "Invalid phone number format.")
+    .regex(/^[0-9]+EGP/, "Invalid phone number format.")
     .min(10, "Phone number must be at least 10 digits."),
 });
 
