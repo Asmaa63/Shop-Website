@@ -1,9 +1,19 @@
 "use client";
-
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { User, Mail, Package, Settings, LogOut, Edit2, Save, X, Lock, Trash2 } from "lucide-react";
+import {
+  User,
+  Mail,
+  Package,
+  Settings,
+  LogOut,
+  Edit2,
+  Save,
+  X,
+  Lock,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,11 +78,7 @@ export default function AccountPage() {
       const response = await fetch("/api/users/profile");
       if (response.ok) {
         const data = await response.json();
-        setProfileData({
-          name: data.name || "",
-          email: data.email || "",
-          phone: data.phone || "",
-        });
+        setProfileData(data);
       }
     } catch (error) {
       console.error("Failed to load profile:", error);
@@ -80,43 +86,43 @@ export default function AccountPage() {
   };
 
   const handleUpdateProfile = async () => {
-  setIsLoading(true);
-  try {
-    const response = await fetch("/api/users/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profileData),
-    });
+    try {
+      const response = await fetch("/api/users/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileData),
+      });
 
-    if (!response.ok) throw new Error("Failed to update profile");
+      if (!response.ok) throw new Error("Failed to update profile");
 
-    await update({
-      ...session,
-      user: {
-        ...session?.user,
-        name: profileData.name,
-        email: profileData.email,
-      },
-    });
+      const data = await response.json();
 
-    toast({
-      title: "Success!",
-      description: "Your profile has been updated successfully.",
-    });
+      setProfileData(data.user);
 
-    await loadUserProfile(); // ✅ refresh data from server
-    setIsEditing(false); // ✅ go back to normal view
-  } catch (error) {
-    toast({
-      title: "Error",
-      description: "Failed to update profile. Please try again.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          name: data.user.name,
+          email: data.user.email,
+        },
+      });
 
+      toast({
+        title: "Success!",
+        description: "Your profile has been updated successfully.",
+      });
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error!",
+        description: "Failed to update profile.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -165,13 +171,13 @@ export default function AccountPage() {
       });
       setShowPasswordDialog(false);
     } catch (error) {
-  const message =
-    error instanceof Error ? error.message : "Failed to change password.";
-  toast({
-    title: "Error",
-    description: message,
-    variant: "destructive",
-  });
+      const message =
+        error instanceof Error ? error.message : "Failed to change password.";
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -223,17 +229,35 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-8 text-white">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
-              <User className="w-12 h-12" />
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 sm:p-8 mb-8 text-white overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full shrink-0">
+                <User className="w-12 h-12" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold truncate">
+                  Welcome back, {session.user?.name}!
+                </h1>
+                <p className="text-blue-100 text-sm sm:text-base truncate max-w-[250px] sm:max-w-none">
+                  {session.user?.email}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold">Welcome back, {session.user?.name}!</h1>
-              <p className="text-blue-100 mt-1">{session.user?.email}</p>
-            </div>
+
+            {!isEditing && (
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="outline"
+                size="sm"
+                className="bg-white text-blue-600 hover:bg-gray-100 self-start sm:self-auto"
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Button>
+            )}
           </div>
         </div>
 
@@ -287,17 +311,18 @@ export default function AccountPage() {
 
           <div className="lg:col-span-3">
             {activeTab === "profile" && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Profile Information</h2>
-                  {!isEditing ? (
-                    <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
-                      <Edit2 className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Button onClick={handleUpdateProfile} disabled={isLoading} size="sm">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                    Profile Information
+                  </h2>
+                  {isEditing && (
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        onClick={handleUpdateProfile}
+                        disabled={isLoading}
+                        size="sm"
+                      >
                         <Save className="w-4 h-4 mr-2" />
                         {isLoading ? "Saving..." : "Save"}
                       </Button>
@@ -327,12 +352,14 @@ export default function AccountPage() {
                         onChange={(e) =>
                           setProfileData({ ...profileData, name: e.target.value })
                         }
-                        className="max-w-md"
+                        className="max-w-md w-full"
                       />
                     ) : (
-                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg max-w-md">
-                        <User className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-900 font-medium">{profileData.name}</span>
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg max-w-md overflow-hidden">
+                        <User className="w-5 h-5 text-gray-400 shrink-0" />
+                        <span className="text-gray-900 font-medium truncate">
+                          {profileData.name}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -341,11 +368,15 @@ export default function AccountPage() {
                     <Label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address
                     </Label>
-                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg max-w-md">
-                      <Mail className="w-5 h-5 text-gray-400" />
-                      <span className="text-gray-900 font-medium">{profileData.email}</span>
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg max-w-md overflow-hidden">
+                      <Mail className="w-5 h-5 text-gray-400 shrink-0" />
+                      <span className="text-gray-900 font-medium break-all">
+                        {profileData.email}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">Email cannot be changed</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Email cannot be changed
+                    </p>
                   </div>
 
                   <div>
@@ -359,11 +390,11 @@ export default function AccountPage() {
                           setProfileData({ ...profileData, phone: e.target.value })
                         }
                         placeholder="+20 1065307167"
-                        className="max-w-md"
+                        className="max-w-md w-full"
                       />
                     ) : (
-                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg max-w-md">
-                        <span className="text-gray-900 font-medium">
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg max-w-md overflow-hidden">
+                        <span className="text-gray-900 font-medium truncate">
                           {profileData.phone || "Not provided"}
                         </span>
                       </div>
@@ -376,12 +407,16 @@ export default function AccountPage() {
             {activeTab === "orders" && <OrdersPage />}
 
             {activeTab === "settings" && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h2>
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  Account Settings
+                </h2>
 
                 <div className="space-y-6">
                   <div className="pb-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Security</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Security
+                    </h3>
                     <Button onClick={() => setShowPasswordDialog(true)} variant="outline">
                       <Lock className="w-4 h-4 mr-2" />
                       Change Password
@@ -389,7 +424,9 @@ export default function AccountPage() {
                   </div>
 
                   <div className="pb-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Notifications
+                    </h3>
                     <div className="space-y-3">
                       <label className="flex items-center gap-3 cursor-pointer">
                         <input
@@ -397,7 +434,10 @@ export default function AccountPage() {
                           className="w-5 h-5 text-blue-600 rounded"
                           checked={notifications.email}
                           onChange={(e) =>
-                            setNotifications({ ...notifications, email: e.target.checked })
+                            setNotifications({
+                              ...notifications,
+                              email: e.target.checked,
+                            })
                           }
                         />
                         <span className="text-gray-700">Email notifications</span>
@@ -408,7 +448,10 @@ export default function AccountPage() {
                           className="w-5 h-5 text-blue-600 rounded"
                           checked={notifications.orderUpdates}
                           onChange={(e) =>
-                            setNotifications({ ...notifications, orderUpdates: e.target.checked })
+                            setNotifications({
+                              ...notifications,
+                              orderUpdates: e.target.checked,
+                            })
                           }
                         />
                         <span className="text-gray-700">Order updates</span>
@@ -419,7 +462,10 @@ export default function AccountPage() {
                           className="w-5 h-5 text-blue-600 rounded"
                           checked={notifications.promotional}
                           onChange={(e) =>
-                            setNotifications({ ...notifications, promotional: e.target.checked })
+                            setNotifications({
+                              ...notifications,
+                              promotional: e.target.checked,
+                            })
                           }
                         />
                         <span className="text-gray-700">Promotional emails</span>
@@ -428,7 +474,9 @@ export default function AccountPage() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-red-500 mb-4">Danger Zone</h3>
+                    <h3 className="text-lg font-semibold text-red-500 mb-4">
+                      Danger Zone
+                    </h3>
                     <Button
                       onClick={() => setShowDeleteDialog(true)}
                       variant="destructive"
@@ -460,7 +508,10 @@ export default function AccountPage() {
                 type="password"
                 value={passwordData.currentPassword}
                 onChange={(e) =>
-                  setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                  setPasswordData({
+                    ...passwordData,
+                    currentPassword: e.target.value,
+                  })
                 }
               />
             </div>
@@ -471,7 +522,10 @@ export default function AccountPage() {
                 type="password"
                 value={passwordData.newPassword}
                 onChange={(e) =>
-                  setPasswordData({ ...passwordData, newPassword: e.target.value })
+                  setPasswordData({
+                    ...passwordData,
+                    newPassword: e.target.value,
+                  })
                 }
               />
             </div>
@@ -482,7 +536,10 @@ export default function AccountPage() {
                 type="password"
                 value={passwordData.confirmPassword}
                 onChange={(e) =>
-                  setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                  setPasswordData({
+                    ...passwordData,
+                    confirmPassword: e.target.value,
+                  })
                 }
               />
             </div>
@@ -499,18 +556,23 @@ export default function AccountPage() {
       </Dialog>
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[80vh] text-white overflow-y-auto bg-gray-500">
           <DialogHeader>
-            <DialogTitle>Delete Account</DialogTitle>
+            <DialogTitle className="text-red-900">Delete Account</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.
+              Are you sure you want to delete your account? This action cannot be undone
+              and all your data will be permanently deleted.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteAccount} disabled={isLoading}>
+                        <Button
+              onClick={handleDeleteAccount}
+              variant="destructive"
+              disabled={isLoading}
+            >
               {isLoading ? "Deleting..." : "Delete Account"}
             </Button>
           </DialogFooter>
@@ -519,3 +581,4 @@ export default function AccountPage() {
     </div>
   );
 }
+

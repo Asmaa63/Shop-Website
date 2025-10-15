@@ -3,6 +3,7 @@ import ProductDetails from "@/components/customer/ProductDetails";
 import RelatedProducts from "@/components/customer/RelatedProducts";
 import productsData from "@/data/products.json";
 import { Product, RawProductData, ProductsDataFile } from "@/lib/types";
+import { Metadata } from "next"; 
 
 const data = productsData as unknown as ProductsDataFile;
 const rawProducts: RawProductData[] = data.products;
@@ -28,10 +29,44 @@ export function generateStaticParams() {
   }));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FixedPageProps = Record<string, any>;
+interface ProductPageProps {
+  params: {
+    id: string; // The dynamic segment from the URL
+  };
+}
 
-export default async function ProductPage({ params }: FixedPageProps) {
+// --- Dynamic Metadata Generation (SEO) ---
+/**
+ * Generates dynamic SEO metadata (title, description) based on the product ID.
+ */
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const id = params.id;
+  const product = products.find((p) => p.id === id);
+
+  if (!product) {
+    return {
+      title: "Product Not Found | Exclusive Store",
+      description: "The product you are looking for does not exist or has been discontinued.",
+    };
+  }
+
+  // Create dynamic title and use a truncated description for brevity
+  const description = product.description.substring(0, 150).trim() + (product.description.length > 150 ? '...' : '');
+
+  return {
+    title: `${product.name} - ${product.brand} | Exclusive Store`,
+    description: description,
+    keywords: [
+      product.name.toLowerCase(),  
+      product.category.toLowerCase(), 
+      "product details", 
+      "buy online"
+    ],
+  };
+}
+// ------------------------------------------
+
+export default async function ProductPage({ params }: ProductPageProps) {
   const id = params?.id?.toString?.() ?? "";
 
   const product = products.find((p) => p.id === id);

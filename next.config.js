@@ -18,6 +18,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  swcMinify: true,
+  experimental: {
+    legacyBrowsers: false, 
+  },
 };
 
 module.exports = nextConfig;

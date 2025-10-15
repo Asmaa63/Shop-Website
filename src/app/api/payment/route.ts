@@ -20,43 +20,37 @@ export async function POST(request: NextRequest) {
     }
 
     // --- 1. Prepare Line Items for Stripe ---
-    const lineItems = items.map(item => ({
-      price_data: {
-        currency: 'usd', 
-        product_data: {
-          name: item.name,
-          images: [item.imageUrl],
-          description: `Product ID: EGP{item._id}`, // Use _id here
-        },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.quantity,
-    }));
+    const lineItems = items.map((item) => ({
+  price_data: {
+    currency: "usd",
+    product_data: {
+      name: item.name,
+      images: item.imageUrl ? [item.imageUrl] : [],
+      description: `Product ID: ${item._id ?? item.id}`, 
+    },
+    unit_amount: Math.round(item.price * 100),
+  },
+  quantity: item.quantity,
+}));
+
 
     // --- 2. Calculate dynamic URLs for redirection ---
     const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000';
-    const successUrl = `EGP{baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `EGP{baseUrl}/checkout?cancelled=true`;
+    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/checkout?cancelled=true`;
 
     // --- 3. Create Stripe Checkout Session ---
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      
-      // Pass shipping details to Stripe
-      shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB', 'EG'] },
-      customer_email: 'customer@example.com', 
-      
-      // Metadata to pass data about the order to the Stripe webhook later (important!)
-      metadata: {
-        shipping_address: JSON.stringify(shippingAddress),
-        // Add userId from NextAuth session here
-      },
-
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-    });
+  line_items: lineItems,
+  mode: 'payment',
+  shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB', 'EG'] },
+  customer_email: 'customer@example.com',
+  metadata: {
+    shipping_address: JSON.stringify(shippingAddress),
+  },
+  success_url: successUrl,
+  cancel_url: cancelUrl,
+});
 
     // Return the session URL to the client for redirection
     return NextResponse.json({ url: session.url }, { status: 200 });

@@ -109,7 +109,7 @@ export default function CategoriesGrid() {
             href="/shop"
             className="inline-block bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-smooth"
           >
-            View All Categories →
+            View All Categories 
           </Link>
         </div>
       </div>

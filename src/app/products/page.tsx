@@ -1,6 +1,16 @@
 import ProductsGrid from '@/components/customer/ProductsGrid';
 import productsData from '@/data/products.json';
 import { Product } from '@/lib/types';
+import type { Metadata } from "next"; // Imported Metadata type
+
+// --- SEO Metadata for Next.js Page (English) ---
+// This block sets the page title, description, and keywords for search engines.
+export const metadata: Metadata = {
+    title: "All Products | Shop the Latest Collections - Exclusive Store",
+    description: "Browse our complete collection of products. Find the newest trends, best sellers, and exclusive items across all categories for all your needs.",
+    keywords: ["all products", "shop online", "latest collection", "ecommerce store", "best sellers", "online shopping", "new arrivals"],
+};
+// -------------------------------------
 
 // Define the shape of the source data item from products.json for safe access.
 interface SourceProduct {
@@ -39,16 +49,16 @@ const products: Product[] = (productsData.products as SourceProduct[])
 
 
 export default function ProductsPage() {
-  return (
-    <>
-      <main className="min-h-screen bg-gray-50">
-        <ProductsGrid 
-          // Pass the fully typed and mapped 'products' array
-          products={products} 
-          title="All Products" 
-          showFilters={true} 
-        />
-      </main>
-    </>
-  );
+    return (
+        <>
+            <main className="min-h-screen bg-gray-50">
+                <ProductsGrid 
+                    // Pass the fully typed and mapped 'products' array
+                    products={products} 
+                    title="All Products" 
+                    showFilters={true} 
+                />
+            </main>
+        </>
+    );
 }

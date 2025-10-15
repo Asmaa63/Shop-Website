@@ -11,13 +11,14 @@ const slides = [
     description: "Shop the latest trends and save big on your favorite items",
     cta: "Shop Now",
     link: "/shop",
+    priority: true,
     bgColor: "from-orange-500 to-pink-500",
     image: "https://picsum.photos/800/600?random=1"
   },
   {
     id: 2,
     title: "New Arrivals",
-    subtitle: "Fresh Collection 2024",
+    subtitle: "Fresh Copriollection 2024",
     description: "Discover the newest products just added to our store",
     cta: "Explore",
     link: "/shop?filter=new",

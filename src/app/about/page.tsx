@@ -1,9 +1,9 @@
 "use client";
-
 import { motion } from "framer-motion";
-import { Users, ShoppingBag, DollarSign, Award, Target, Eye, Heart } from "lucide-react";
+import { Users, ShoppingBag, DollarSign, Award, Eye, Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+
 
 const stats = [
   {
@@ -153,7 +153,7 @@ export default function AboutPage() {
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: 360 }}
                   transition={{ duration: 0.5 }}
-                  className={`w-16 h-16 rounded-full EGP{stat.color} flex items-center justify-center mb-4`}
+                  className={`w-16 h-16 rounded-full ${stat.color} flex items-center justify-center mb-4`}
                 >
                   <stat.icon className="w-8 h-8" />
                 </motion.div>

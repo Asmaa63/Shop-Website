@@ -2,17 +2,30 @@
 
 // Base Product Interface
 export interface Product {
-  _id: string; // MongoDB ID
+  _id?: string;
+  id: string;
   name: string;
   price: number;
-  stock: number; // Available quantity
-  category: string;
-  description: string;
-  imageUrl: string;
-  slug: string; 
+  image: string;
+  imageUrl?: string; // ✅ خليه اختياري
+  slug: string;
   createdAt: Date;
   updatedAt: Date;
+
+  stock?: number;
+  stockQuantity?: number;
+  category?: string;
+  description?: string;
+  colors?: string[];
+  sizes?: string[];
+  inStock?: boolean;
+  rating?: number;
+  reviewCount?: number;
+  originalPrice?: number;
+  features?: string[];
 }
+
+
 
 // User Interface (used with NextAuth.js)
 export interface User {

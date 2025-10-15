@@ -1,7 +1,5 @@
 // File: app/account/orders/page.tsx
-
 "use client";
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Package, Eye, Download, Truck, CheckCircle, Clock, X } from "lucide-react";
@@ -180,7 +178,16 @@ export default function OrdersPage() {
                                                     >
                                                         {/* NOTE: The item.image emoji property might not exist on the CartItem type */}
                                                         {/* You might need to adjust item.image based on your actual data */}
-                                                        <span className="text-2xl">📦</span> 
+                                                        {item.imageUrl ? (
+  <img
+    src={item.imageUrl}
+    alt={item.name}
+    className="w-10 h-10 rounded-md object-cover"
+  />
+) : (
+  <span className="text-2xl">📦</span> 
+)}
+
                                                         <span className="flex-1">
                                                             {item.name} × {item.quantity}
                                                         </span>
@@ -283,7 +290,17 @@ export default function OrdersPage() {
                                                 key={idx}
                                                 className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
                                             >
-                                                <span className="text-3xl">📦</span>
+                                                {item.imageUrl ? (
+  <img
+    src={item.imageUrl}
+    alt={item.name}
+    className="w-12 h-12 rounded-md object-cover"
+  />
+) : (
+  <span className="text-3xl">📦</span>
+)}
+
+
                                                 <div className="flex-1">
                                                     <p className="font-semibold">{item.name}</p>
                                                     <p className="text-sm text-gray-500">Qty: {item.quantity}</p>

@@ -7,7 +7,7 @@ import { Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function CartSummary() {
-  const { items, totalPrice, removeItem, updateQuantity } = useCartStore();
+  const { items, totalPrice, removeItem, updateItemQuantity } = useCartStore();
 
   if (items.length === 0) {
     return <div className="p-4 text-center text-gray-500">Your cart is empty.</div>;
@@ -49,7 +49,7 @@ export default function CartSummary() {
                 min="1"
                 value={item.quantity}
                 // FIX: Use item._id
-                onChange={(e) => updateQuantity(item._id, parseInt(e.target.value))} 
+                onChange={(e) => updateItemQuantity(item._id!, parseInt(e.target.value))}
                 className="w-16 p-1 border rounded text-center focus:border-indigo-500 transition-colors"
               />
               
@@ -60,7 +60,7 @@ export default function CartSummary() {
                 variant="ghost" 
                 size="icon" 
                 // FIX: Use item._id
-                onClick={() => removeItem(item._id)}
+                onClick={() => removeItem(item._id!)}
                 className="hover:bg-red-50"
               >
                 <Trash2 className="h-4 w-4 text-red-500" />

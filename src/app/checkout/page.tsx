@@ -1,7 +1,5 @@
 // File: checkout/page.tsx (Corrected/Simplified)
-
-'use client';
-
+"use client";
 import React from 'react';
 import { useCartStore } from '@/store/cartStore';
 import CheckoutForm from '@/components/checkout/CheckoutForm'; 

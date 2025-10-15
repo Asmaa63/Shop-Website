@@ -1,8 +1,8 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react"; // Import useSession
 import {
   Settings,
   User,
@@ -21,9 +21,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Assuming AvatarImage is available
 import { toast } from "sonner";
 
+// --- Types for Profile Data (must match your API response) ---
+type ProfileData = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  image: string;
+  bio?: string;
+};
 
 // Profile form inputs
 type ProfileFormData = {
@@ -41,8 +50,10 @@ type PasswordFormData = {
   confirmPassword: string;
 };
 
-
 export default function SettingsPage() {
+  const { data: session } = useSession();
+  const [userData, setUserData] = useState<ProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [notifications, setNotifications] = useState({
@@ -53,26 +64,83 @@ export default function SettingsPage() {
   });
 
   const {
-  register: registerProfile,
-  handleSubmit: handleProfileSubmit,
-} = useForm<ProfileFormData>();
+    register: registerProfile,
+    handleSubmit: handleProfileSubmit,
+    reset, // 🛑 Added reset function
+  } = useForm<ProfileFormData>();
 
-const {
-  register: registerPassword,
-  handleSubmit: handlePasswordSubmit,
-} = useForm<PasswordFormData>();
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+  } = useForm<PasswordFormData>();
 
+  // --- useEffect to Fetch User Data and Populate Form ---
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/users/profile");
+        if (!res.ok) throw new Error("Failed to load profile");
+        const data: ProfileData = await res.json();
+        setUserData(data);
 
+        // Split name for firstName and lastName
+        const nameParts = data.name?.split(" ") || [];
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || ""; // Handle names with more than two parts
+
+        // 🛑 Populate the form with real data using reset()
+        reset({
+          firstName: firstName,
+          lastName: lastName,
+          email: data.email || "",
+          phone: data.phone || "",
+          bio: data.bio || "", // Must ensure 'bio' is returned by your API
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load profile data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [reset]); // Dependency array includes reset
+
+  // --- Handlers ---
   const onProfileSubmit = (data: ProfileFormData) => {
-  toast.success("Profile updated successfully!");
-  console.log("Profile Data:", data);
-};
+    toast.success("Profile updated successfully!");
+    console.log("Profile Data:", data);
+  };
 
   const onPasswordSubmit = (data: PasswordFormData) => {
-  toast.success("Password changed successfully!");
-  console.log("Password Data:", data);
-}
+    toast.success("Password changed successfully!");
+    console.log("Password Data:", data);
+  };
+  
+  
+  // Get initials for Avatar fallback
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+  
+  const initials = userData?.name ? getInitials(userData.name) : (session?.user?.name ? getInitials(session.user.name) : "AC");
 
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h1 className="text-3xl font-bold text-gray-700">Loading Settings...</h1>
+        </div>
+      </main>
+    );
+  }
+  
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
       <div className="max-w-5xl mx-auto px-4">
@@ -89,25 +157,40 @@ const {
         </motion.div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white rounded-2xl p-2 shadow-lg">
-            <TabsTrigger value="profile" className="rounded-xl gap-2">
-              <User className="w-4 h-4" />
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="security" className="rounded-xl gap-2">
-              <Lock className="w-4 h-4" />
-              Security
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="rounded-xl gap-2">
-              <Bell className="w-4 h-4" />
-              Notifications
-            </TabsTrigger>
-            <TabsTrigger value="privacy" className="rounded-xl gap-2">
-              <Shield className="w-4 h-4" />
-              Privacy
-            </TabsTrigger>
-          </TabsList>
-
+          <TabsList className="grid w-full grid-cols-4 bg-gray-200 rounded-xl shadow-inner  md:shadow-lg">
+  {/* 💡 TabsTrigger: تعديل الخط والحجم وإضافة انتقال سلس */}
+  <TabsTrigger 
+    value="profile" 
+    className="rounded-lg gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 transition-all duration-200 md:text-base md:py-2 "
+  >
+    <User className="w-4 h-4" /> 
+    Profile
+  </TabsTrigger>
+  
+  <TabsTrigger 
+    value="security" 
+    className="rounded-lg gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 transition-all duration-200 md:text-base md:py-2"
+  >
+    <Lock className="w-4 h-4" />
+    Security
+  </TabsTrigger>
+  
+  <TabsTrigger 
+    value="notifications" 
+    className="rounded-lg gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 transition-all duration-200 md:text-base md:py-2"
+  >
+    <Bell className="w-4 h-4" />
+    Notifications
+  </TabsTrigger>
+  
+  <TabsTrigger 
+    value="privacy" 
+    className="rounded-lg gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 transition-all duration-200 md:text-base md:py-2"
+  >
+    <Shield className="w-4 h-4" />
+    Privacy
+  </TabsTrigger>
+</TabsList>
           {/* Profile Tab */}
           <TabsContent value="profile">
             <motion.div
@@ -125,27 +208,32 @@ const {
                 <div className="flex items-center gap-6">
                   <div className="relative">
                     <Avatar className="w-24 h-24">
+                      {/* 🛑 Use image from fetched data */}
+                      <AvatarImage 
+  src={userData?.image || session?.user?.image || undefined} 
+  alt={userData?.name || session?.user?.name || "User Avatar"} 
+/>
                       <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white text-3xl">
-                        JD
+                        {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <motion.button
+                    {/* <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg"
                     >
                       <Camera className="w-4 h-4" />
-                    </motion.button>
+                    </motion.button> */}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Profile Picture</h3>
-                    <p className="text-sm text-gray-500 mb-2">
+                    <h3 className="font-semibold text-lg">{userData?.name || "Update Name"}</h3>
+                    {/* <p className="text-sm text-gray-500 mb-2">
                       JPG, PNG or GIF, max 5MB
                     </p>
                     <Button variant="outline" size="sm" className="rounded-lg">
                       Upload Photo
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
 
@@ -154,7 +242,6 @@ const {
                   <div>
                     <Label htmlFor="firstName">First Name</Label>
                     <Input id="firstName" {...registerProfile("firstName")} className="mt-2 h-11 rounded-lg" />
-
                   </div>
                   <div>
                     <Label htmlFor="lastName">Last Name</Label>
@@ -166,25 +253,27 @@ const {
                   </div>
                   <div>
                     <Label htmlFor="email">Email Address</Label>
+                    {/* 🛑 Removed defaultValue to allow reset() to control value */}
                     <Input
                       id="email"
                       type="email"
-                      defaultValue="john.doe@example.com"
                       {...registerProfile("email")}
                       className="mt-2 h-11 rounded-lg"
+                      disabled // Email is usually not editable in the profile
                     />
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number</Label>
+                    {/* 🛑 Removed defaultValue to allow reset() to control value */}
                     <Input
                       id="phone"
-                      defaultValue="+1 (555) 123-4567"
                       {...registerProfile("phone")}
                       className="mt-2 h-11 rounded-lg"
                     />
                   </div>
                   <div className="md:col-span-2">
                     <Label htmlFor="bio">Bio</Label>
+                    {/* 🛑 Removed defaultValue to allow reset() to control value */}
                     <textarea
                       id="bio"
                       {...registerProfile("bio")}
@@ -361,11 +450,11 @@ const {
                       </div>
                     </div>
                     <Switch
-  checked={notifications[item.key as keyof typeof notifications]}
-  onCheckedChange={(checked: boolean) =>
-    setNotifications({ ...notifications, [item.key]: checked })
-  }
-/>
+                      checked={notifications[item.key as keyof typeof notifications]}
+                      onCheckedChange={(checked: boolean) =>
+                        setNotifications({ ...notifications, [item.key]: checked })
+                      }
+                    />
                   </div>
                 ))}
               </div>

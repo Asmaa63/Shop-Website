@@ -4,7 +4,6 @@ import Header from '@/components/layout/Header';
 export default function NotFound() {
   return (
     <>
-      <Header />
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md mx-auto text-center px-4">
           <div className="text-8xl mb-6">🔍</div>

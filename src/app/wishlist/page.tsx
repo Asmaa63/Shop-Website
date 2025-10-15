@@ -1,5 +1,4 @@
 "use client";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, ShoppingCart, Trash2, Share2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";

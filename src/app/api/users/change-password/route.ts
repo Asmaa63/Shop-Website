@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { compare, hash } from "bcryptjs";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
-
-const USERS_FILE = join(process.cwd(), "data", "users.json");
-interface User {
-  email: string;
-  password: string;
-  updatedAt?: string;
-}
-
+import clientPromise from "@/lib/mongodb";
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,19 +29,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!existsSync(USERS_FILE)) {
-      return NextResponse.json({ error: "User data not found" }, { status: 404 });
-    }
+    const client = await clientPromise;
+    const db = client.db("ecommerceDB");
+    const usersCollection = db.collection("users");
 
-    const data = readFileSync(USERS_FILE, "utf-8");
-    const usersData = JSON.parse(data);
-    const userIndex = usersData.users.findIndex((u: User) => u.email === session.user.email);
+    const user = await usersCollection.findOne({ email: session.user.email });
 
-    if (userIndex === -1) {
+    if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const user = usersData.users[userIndex];
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "Cannot change password for OAuth users" },
+        { status: 400 }
+      );
+    }
+
     const isValidPassword = await compare(currentPassword, user.password);
 
     if (!isValidPassword) {
@@ -61,10 +56,16 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await hash(newPassword, 12);
-    usersData.users[userIndex].password = hashedPassword;
-    usersData.users[userIndex].updatedAt = new Date().toISOString();
 
-    writeFileSync(USERS_FILE, JSON.stringify(usersData, null, 2));
+    await usersCollection.updateOne(
+      { email: session.user.email },
+      {
+        $set: {
+          password: hashedPassword,
+          updatedAt: new Date(),
+        },
+      }
+    );
 
     return NextResponse.json({
       message: "Password changed successfully",

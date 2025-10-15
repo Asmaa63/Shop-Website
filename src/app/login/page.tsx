@@ -1,12 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
-
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({

@@ -10,13 +10,12 @@ import type { ShippingAddress } from '@/lib/validation/checkoutSchema';
 // 1. Define the Order Type and EXPORT it
 // ----------------------------------------------------
 
-// FIX 1: Define and Export the Order type
 export interface Order {
-    id: number; // Order ID (usually from backend, using number for temporary local ID)
+    id: number; 
     items: CartItem[];
     totalAmount: number;
     orderTotal: number;
-    shippingDetails: ShippingAddress; // Use your actual ShippingAddress type
+    shippingDetails: ShippingAddress; 
     orderDate: string;
     paymentMethod: 'online' | 'cod';
     status: string;
@@ -26,20 +25,28 @@ export interface Order {
 // 2. Define the Cart State and Actions
 // ----------------------------------------------------
 
+// NOTE: We change 'updateQuantity' to 'updateItemQuantity' to match the ProductCard component
+// and add 'getItemQuantity' (which is a Getter function)
 interface CartState {
     items: CartItem[];
-    orders: Order[]; // FIX 2: Add state for user orders
+    orders: Order[];
     
     // Actions
     addItem: (product: Product, quantity?: number) => void;
     removeItem: (productId: string) => void;
-    updateQuantity: (productId: string, quantity: number) => void;
+    
+    // RENAMED from 'updateQuantity'
+    updateItemQuantity: (productId: string, quantity: number) => void; 
+    
     clearCart: () => void;
-    addOrder: (order: Order) => void; // FIX 3: Add action to save an order
+    addOrder: (order: Order) => void;
     
     // Getters
     totalItems: number;
     totalPrice: number;
+
+    // ADDED: The function needed by ProductCard to get the current quantity
+    getItemQuantity: (productId: string) => number; 
 }
 
 // ----------------------------------------------------
@@ -57,11 +64,20 @@ export const useCartStore = create<CartState>()(
     persist(
         (set, get) => ({
             items: [],
-            orders: [], // FIX 4: Initialize the orders array
+            orders: [],
             totalItems: 0,
             totalPrice: 0,
 
-            // --- Existing Actions Implementation (Unchanged logic) ---
+            // --- Getters Implementation (Needed for ProductCard) ---
+
+            // IMPLEMENTED: getItemQuantity 
+            getItemQuantity: (productId) => {
+                const item = get().items.find(item => item._id === productId);
+                return item ? item.quantity : 0;
+            },
+
+
+            // --- Actions Implementation ---
 
             addItem: (product, quantity = 1) => {
                 set((state) => {
@@ -71,7 +87,8 @@ export const useCartStore = create<CartState>()(
                     if (itemIndex > -1) {
                         newItems[itemIndex].quantity += quantity;
                     } else {
-                        newItems.push({ ...product, quantity });
+                        // Using product._id as the identifier (as used in removeItem/updateQuantity)
+                        newItems.push({ ...product, quantity, _id: product._id }); 
                     }
 
                     return { 
@@ -92,16 +109,18 @@ export const useCartStore = create<CartState>()(
                 });
             },
 
-            updateQuantity: (productId, quantity) => {
+            // IMPLEMENTED: updateItemQuantity (Renamed from updateQuantity)
+            updateItemQuantity: (productId, quantity) => {
                 set((state) => {
+                    // Check if quantity is zero or less, then remove the item
                     if (quantity <= 0) {
-                        const newItems = state.items.filter(item => item._id !== productId);
-                        return {
-                            items: newItems,
-                            ...calculateTotals(newItems)
+                        return { 
+                            items: state.items.filter(item => item._id !== productId),
+                            ...calculateTotals(state.items.filter(item => item._id !== productId))
                         };
                     }
 
+                    // Update the quantity of the existing item
                     const newItems = state.items.map(item =>
                         item._id === productId ? { ...item, quantity } : item
                     );
@@ -113,27 +132,21 @@ export const useCartStore = create<CartState>()(
                 });
             },
 
-            // --- New/Modified Actions ---
-
-            // FIX 5: Modified clearCart to also reset orders (optional, but good practice)
             clearCart: () => set({ 
                 items: [], 
                 totalItems: 0, 
                 totalPrice: 0 
-                // We keep 'orders' here so previous orders are still visible after checkout
             }),
             
-            // FIX 6: Implementation of addOrder
             addOrder: (order) => {
                 set(state => ({
-                    orders: [order, ...state.orders], // Add the new order to the beginning
+                    orders: [order, ...state.orders], 
                 }));
             }
         }),
         {
             name: 'ecommerce-cart-storage',
             storage: createJSONStorage(() => localStorage),
-            // FIX 7: Include 'orders' state in persist keys
             partialize: (state) => ({ 
                 items: state.items, 
                 orders: state.orders 

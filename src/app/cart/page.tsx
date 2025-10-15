@@ -1,5 +1,4 @@
 "use client";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,31 +7,23 @@ import { useCartStore } from "@/store/cartStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-// 
-// The previously imported CartItem type from "@/types" was causing errors because it
-// was missing 'id' and 'image'. We define the correct interface locally to ensure 
-// compilation success within this specific file.
-// 
+
 interface CartItem {
-  id: string; // Required for key, updateQuantity, and removeItem
+  id: string;
   name: string;
   price: number;
   quantity: number;
   category: string;
-  image: string; // Required for <Image src={item.image} />
+  image: string;
 }
 
 export default function CartPage() {
-  const { items: rawItems, updateQuantity, removeItem, clearCart } = useCartStore();
-  
-  // Use a double type assertion (to unknown first) to explicitly bypass the TypeScript
-  // error (ts(2352)) caused by the shadowing conflict between the local and imported CartItem types.
+  const { items: rawItems, updateItemQuantity, removeItem, clearCart } = useCartStore();
   const items = rawItems as unknown as CartItem[];
-  
+
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
-  // Using 'items' which is now correctly typed
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = appliedCoupon ? subtotal * 0.1 : 0;
   const shipping = subtotal > 100 ? 0 : 10;
@@ -78,22 +69,20 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-8 text-center lg:text-left"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Shopping Cart
           </h1>
           <p className="text-gray-600">{items.length} items in your cart</p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             <AnimatePresence>
               {items.map((item, index) => (
@@ -103,13 +92,12 @@ export default function CartPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                  className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow"
                 >
-                  <div className="flex gap-6">
-                    {/* Product Image */}
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="relative w-32 h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0"
+                      className="relative w-full sm:w-32 h-40 sm:h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0"
                     >
                       <Image
                         src={item.image}
@@ -119,9 +107,8 @@ export default function CartPage() {
                       />
                     </motion.div>
 
-                    {/* Product Details */}
                     <div className="flex-1">
-                      <div className="flex justify-between items-start mb-3">
+                      <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
                         <div>
                           <h3 className="font-bold text-lg text-gray-800 mb-1">
                             {item.name}
@@ -132,19 +119,18 @@ export default function CartPage() {
                           whileHover={{ scale: 1.1, rotate: 10 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-600 transition-colors"
+                          className="text-red-500 hover:text-red-600 transition-colors self-end sm:self-start"
                         >
                           <Trash2 className="w-5 h-5" />
                         </motion.button>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-3 bg-gray-100 rounded-lg p-1">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
                             disabled={item.quantity <= 1}
                             className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center disabled:opacity-50"
                           >
@@ -156,16 +142,15 @@ export default function CartPage() {
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
                             className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center"
                           >
                             <Plus className="w-4 h-4" />
                           </motion.button>
                         </div>
 
-                        {/* Price */}
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-blue-600">
+                        <div className="text-center sm:text-right">
+                          <p className="text-xl sm:text-2xl font-bold text-blue-600">
                             EGP{(item.price * item.quantity).toFixed(2)}
                           </p>
                           <p className="text-sm text-gray-500">
@@ -179,7 +164,6 @@ export default function CartPage() {
               ))}
             </AnimatePresence>
 
-            {/* Clear Cart Button */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -196,7 +180,6 @@ export default function CartPage() {
             </motion.div>
           </div>
 
-          {/* Order Summary */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -204,21 +187,20 @@ export default function CartPage() {
             className="lg:col-span-1"
           >
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-              <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
+              <h2 className="text-2xl font-bold mb-6 text-center lg:text-left">Order Summary</h2>
 
-              {/* Coupon Code */}
               <div className="mb-6">
                 <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                   <Tag className="w-4 h-4" />
                   Coupon Code
                 </label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     type="text"
                     placeholder="Enter code"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    className="rounded-lg"
+                    className="rounded-lg flex-1"
                   />
                   <Button
                     onClick={applyCoupon}
@@ -239,7 +221,6 @@ export default function CartPage() {
                 )}
               </div>
 
-              {/* Price Breakdown */}
               <div className="space-y-3 mb-6 pb-6 border-b">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
@@ -257,7 +238,7 @@ export default function CartPage() {
                 )}
                 <div className="flex justify-between text-gray-700">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? "FREE" : `EGPEGP{shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? "FREE" : `EGP${shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (8%)</span>
@@ -265,7 +246,6 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* Total */}
               <div className="flex justify-between items-center mb-6">
                 <span className="text-xl font-bold">Total</span>
                 <span className="text-3xl font-bold text-blue-600">
@@ -273,7 +253,6 @@ export default function CartPage() {
                 </span>
               </div>
 
-              {/* Checkout Button */}
               <Link href="/checkout">
                 <Button
                   size="lg"
@@ -290,12 +269,11 @@ export default function CartPage() {
                 </Button>
               </Link>
 
-              {/* Free Shipping Notice */}
               {subtotal < 100 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 bg-blue-50 rounded-xl text-sm text-blue-800"
+                  className="mt-6 p-4 bg-blue-50 rounded-xl text-sm text-blue-800 text-center lg:text-left"
                 >
                   💡 Add EGP{(100 - subtotal).toFixed(2)} more to get FREE shipping!
                 </motion.div>

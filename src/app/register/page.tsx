@@ -1,11 +1,12 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { User, Mail, Lock, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -168,6 +169,7 @@ export default function RegisterPage() {
                 className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                transition={{ opacity: { duration: 0.2 } }}
               >
                 <p className="font-medium">Error</p>
                 <p className="text-sm">{error}</p>
@@ -179,14 +181,14 @@ export default function RegisterPage() {
                 id: "name",
                 icon: <User className="h-5 w-5 text-gray-400" />,
                 type: "text",
-                placeholder: "John Doe",
+                placeholder: "Asmaa Sharf",
                 label: "Full Name",
               },
               {
                 id: "email",
                 icon: <Mail className="h-5 w-5 text-gray-400" />,
                 type: "email",
-                placeholder: "you@example.com",
+                placeholder: "you@gmail.com",
                 label: "Email Address",
               },
               {

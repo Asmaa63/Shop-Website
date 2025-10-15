@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Plus, Edit, Trash2, Home, Briefcase, Check } from "lucide-react";
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+
 
 interface Address {
   id: string;
@@ -31,10 +31,10 @@ const initialAddresses: Address[] = [
   {
     id: "1",
     type: "home",
-    name: "John Doe",
-    phone: "+1 (555) 123-4567",
-    street: "123 Main Street, Apt 4B",
-    city: "New York",
+    name: "Asmaa sharf",
+    phone: "+20 1065307167",
+    street: "123 street cairo",
+    city: "cairo",
     state: "NY",
     zipCode: "10001",
     isDefault: true,
@@ -42,10 +42,10 @@ const initialAddresses: Address[] = [
   {
     id: "2",
     type: "work",
-    name: "John Doe",
-    phone: "+1 (555) 987-6543",
-    street: "456 Business Ave, Suite 200",
-    city: "New York",
+    name: "asmaa sharf",
+    phone: "+20 1011861030",
+    street: "456 sadat city",
+    city: "sadat city",
     state: "NY",
     zipCode: "10002",
     isDefault: false,
@@ -303,7 +303,7 @@ export default function AddressesPage() {
                     value={formData.name || ""}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="mt-2 h-11 rounded-lg"
-                    placeholder="John Doe"
+                    placeholder="Asmaa sharf"
                   />
                 </div>
                 <div>
@@ -313,7 +313,7 @@ export default function AddressesPage() {
                     value={formData.phone || ""}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="mt-2 h-11 rounded-lg"
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+20 1234567891"
                   />
                 </div>
               </div>
@@ -326,7 +326,7 @@ export default function AddressesPage() {
                   value={formData.street || ""}
                   onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                   className="mt-2 h-11 rounded-lg"
-                  placeholder="123 Main Street, Apt 4B"
+                  placeholder="123 Main Street, cairo"
                 />
               </div>
 
@@ -339,7 +339,7 @@ export default function AddressesPage() {
                     value={formData.city || ""}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="mt-2 h-11 rounded-lg"
-                    placeholder="New York"
+                    placeholder="Cairo"
                   />
                 </div>
                 <div>

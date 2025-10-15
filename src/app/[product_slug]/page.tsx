@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 
 // Mock Product data for demonstration (replace with actual data fetching)
 const mockProduct: Product = {
-  _id: "prod-123", // FIX: Changed 'id' to '_id' to match the Product type
+  _id: "prod-123",
+  id: "prod-123", 
   name: "Stylish T-Shirt",
   price: 29.99,
+  image: "/images/tshirt.jpg", 
   imageUrl: "/images/tshirt.jpg",
   slug: "stylish-t-shirt",
   stock: 50,
@@ -18,6 +20,7 @@ const mockProduct: Product = {
   createdAt: new Date(),
   updatedAt: new Date(),
 };
+
 
 export default function ProductDetailPage() {
   const addItem = useCartStore((state) => state.addItem);
