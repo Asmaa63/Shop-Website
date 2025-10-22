@@ -32,7 +32,7 @@ export async function GET() {
 
     // ✅ استخدمي قاعدة البيانات الصحيحة
     const client = await clientPromise;
-    const db = client.db("ecommerce");
+    const db = client.db("my-shop");
     const usersCollection = db.collection<User>("users");
 
     const user = await usersCollection.findOne({ email: session.user.email });
@@ -75,7 +75,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
 
     const client = await clientPromise;
-    const db = client.db("ecommerce"); 
+    const db = client.db("my-shop"); 
     const usersCollection = db.collection<User>("users");
 
     const updateData: Partial<User> = {

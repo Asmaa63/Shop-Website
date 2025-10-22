@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const client = await clientPromise;
-    const db = client.db("ecommerce");
+    const db = client.db("my-shop");
     const usersCollection: Collection<User> = db.collection("users");
 
     const existingUser = await usersCollection.findOne({ email });

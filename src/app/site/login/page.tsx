@@ -28,17 +28,18 @@ export default function LoginPage() {
 
     try {
       const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
+  email: formData.email,
+  password: formData.password,
+  redirect: false,
+  callbackUrl: "/site/account",
+});
 
       if (result?.error) {
-        setError(result.error);
-      } else if (result?.ok) {
-        router.push("/site/account");
-        router.refresh();
-      }
+  setError(result.error);
+} else if (result?.ok) {
+  router.push(result.url || "/site/account");
+}
+
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

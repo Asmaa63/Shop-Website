@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 
 export async function DELETE(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const client = await clientPromise;
-    const db = client.db("ecommerceDB");
+    const db = client.db("my-shop");
     const usersCollection = db.collection("users");
     const ordersCollection = db.collection("orders");
 
