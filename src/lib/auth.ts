@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user }) {
       try {
         const client = await clientPromise;
-        const db = client.db("my-shop");
+        const db = client.db("ecommerce");
 
         const usersCollection = db.collection("users");
 

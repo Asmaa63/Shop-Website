@@ -10,7 +10,7 @@ const slides = [
     subtitle: "Up to 50% OFF",
     description: "Shop the latest trends and save big on your favorite items",
     cta: "Shop Now",
-    link: "/shop",
+    link: "/site/shop",
     priority: true,
     bgColor: "from-orange-500 to-pink-500",
     image: "https://picsum.photos/800/600?random=1"
@@ -21,7 +21,7 @@ const slides = [
     subtitle: "Fresh Copriollection 2024",
     description: "Discover the newest products just added to our store",
     cta: "Explore",
-    link: "/shop?filter=new",
+    link: "/site/shop?filter=new",
     bgColor: "from-blue-600 to-purple-600",
     image: "https://picsum.photos/800/600?random=2"
   },
@@ -31,7 +31,7 @@ const slides = [
     subtitle: "Tech at Best Prices",
     description: "Get the latest gadgets with exclusive discounts",
     cta: "View Deals",
-    link: "/shop?category=electronics",
+    link: "/site/shop?category=electronics",
     bgColor: "from-green-500 to-teal-500",
     image: "https://picsum.photos/800/600?random=3"
   }

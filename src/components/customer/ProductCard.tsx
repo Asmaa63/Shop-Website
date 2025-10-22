@@ -136,7 +136,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         className="bg-white rounded-2xl shadow-lg p-6 flex gap-6 hover:shadow-xl transition-all"
       >
         <Link 
-          href={`/product/${product.id}`} 
+          href={`/site/product/${product.id}`} 
           className="relative w-32 h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0"
         >
           {/* IMAGE for LIST VIEW */}
@@ -157,11 +157,11 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         <div className="flex-1 flex flex-col justify-between">
           <div>
             <p className="text-sm text-gray-500 mb-1">{product.category}</p>
-            <Link href={`/product/${product.id}`}><h3 className="font-bold text-xl text-gray-800 mb-2 hover:text-blue-600 transition-colors">{product.name}</h3></Link>
+            <Link href={`/site/product/${product.id}`}><h3 className="font-bold text-xl text-gray-800 mb-2 hover:text-blue-600 transition-colors">{product.name}</h3></Link>
             <div className="flex items-center gap-4 mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-blue-600">
-                  EGP{product.price.toFixed(2)}
+                  EGP{product.price ? product.price.toFixed(2) : "0.00"}
                 </span>
                 {product.originalPrice && (
                   <span className="text-sm text-gray-400 line-through">
@@ -204,7 +204,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
   return (
     <motion.div whileHover={{ y: -8 }} className="bg-white rounded-2xl shadow-lg overflow-hidden group">
   <div
-    onClick={() => router.push(`/product/${product.id}`)}
+    onClick={() => router.push(`/site/product/${product.id}`)}
     className="relative h-64 bg-gray-100 overflow-hidden cursor-pointer"
   >
     <Image
@@ -238,7 +238,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         <Heart className={`w-5 h-5 ${isWishlisted ? "fill-white" : ""}`} />
       </motion.button>
 
-      <Link href={`/product/${product.id}`}>
+      <Link href={`/site/product/${product.id}`}>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -252,7 +252,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
 
       <div className="p-5">
         <p className="text-sm text-gray-500 mb-1">{product.category}</p>
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/site/product/${product.id}`}>
             <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
                 {product.name}
             </h3>
@@ -273,7 +273,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
         {/* Price */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl font-bold text-blue-600">
-            EGP{product.price.toFixed(2)}
+            EGP{product.price ? product.price.toFixed(2) : "0.00"}
           </span>
           {product.originalPrice && (
             <span className="text-sm text-gray-400 line-through">

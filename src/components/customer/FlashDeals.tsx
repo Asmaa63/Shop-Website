@@ -120,7 +120,7 @@ export default function FlashDeals() {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Link
-            href="/shop?filter=deals"
+            href="/site/shop?filter=deals"
             className="inline-block bg-red-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-red-600 transition-smooth shadow-lg hover:shadow-xl"
           >
             View All Deals 🔥

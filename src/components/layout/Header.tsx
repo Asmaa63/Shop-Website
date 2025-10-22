@@ -37,18 +37,18 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const categories = [
-    { name: "Electronics", href: "/shop?category=electronics" },
-    { name: "Fashion", href: "/shop?category=fashion" },
-    { name: "Home & Garden", href: "/shop?category=home" },
-    { name: "Sports", href: "/shop?category=sports" },
-    { name: "Books", href: "/shop?category=books" },
+    { name: "Electronics", href: "/site/shop?category=electronics" },
+    { name: "Fashion", href: "/site/shop?category=fashion" },
+    { name: "Home & Garden", href: "/site/shop?category=home" },
+    { name: "Sports", href: "/site/shop?category=sports" },
+    { name: "Books", href: "/site/shop?category=books" },
 ];
 
 const mainLinks = [
-    { name: "Home", path: "/", icon: Home },
-    { name: "Shop", path: "/shop", icon: ShoppingCart },
-    { name: "About", path: "/about", icon: Info },
-    { name: "Contact", path: "/contact", icon: PhoneCall },
+    { name: "Home", path: "/site", icon: Home },
+    { name: "Shop", path: "/site/shop", icon: ShoppingCart },
+    { name: "About", path: "/site/about", icon: Info },
+    { name: "Contact", path: "/site/contact", icon: PhoneCall },
 ];
 
 export default function Navbar() {
@@ -86,12 +86,12 @@ export default function Navbar() {
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            window.location.href = `/shop?search=${encodeURIComponent(searchQuery)}`;
+            window.location.href = `/site/shop?search=${encodeURIComponent(searchQuery)}`;
         }
     };
 
     const handleLogout = async () => {
-        await signOut({ callbackUrl: "/" });
+        await signOut({ callbackUrl: "/site" });
     };
 
     const isActive = (path: string) => pathname === path;
@@ -112,7 +112,7 @@ export default function Navbar() {
                             className="hidden md:block"
                         >
                             Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!{" "}
-                            <Link href="/shop" className="font-semibold underline ml-2 hover:text-red-400">
+                            <Link href="/site/shop" className="font-semibold underline ml-2 hover:text-red-400">
                                 Shop Now
                             </Link>
                         </motion.p>
@@ -227,7 +227,7 @@ export default function Navbar() {
                         <div className="hidden md:flex items-center gap-4 flex-shrink-0">
                             {/* Wishlist */}
                             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                <Link href="/wishlist">
+                                <Link href="/site/wishlist">
                                     <Button variant="ghost" size="icon" className="relative group">
                                         <Heart
                                             className={`w-5 h-5 ${navIconStyle} ${
@@ -245,7 +245,7 @@ export default function Navbar() {
 
                             {/* Cart */}
                             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                <Link href="/cart">
+                                <Link href="/site/cart">
                                     <Button variant="ghost" size="icon" className="relative group">
                                         <ShoppingCart className={navIconStyle} />
                                         {mounted && cartItemsCount > 0 && (
@@ -278,19 +278,19 @@ export default function Navbar() {
                                         </div>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild className="hover:bg-red-50 transition-colors">
-                                            <Link href="/account" className="cursor-pointer">
+                                            <Link href="/site/account" className="cursor-pointer">
                                                 <User className="mr-2 w-4 h-4" />
                                                 My Account
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild className="hover:bg-red-50 transition-colors">
-                                            <Link href="/account/orders" className="cursor-pointer">
+                                            <Link href="/site/account/orders" className="cursor-pointer">
                                                 <Package className="mr-2 w-4 h-4" />
                                                 Orders
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild className="hover:bg-red-50 transition-colors">
-                                            <Link href="/account/settings" className="cursor-pointer">
+                                            <Link href="/site/account/settings" className="cursor-pointer">
                                                 <Settings className="mr-2 w-4 h-4" />
                                                 Settings
                                             </Link>
@@ -303,7 +303,7 @@ export default function Navbar() {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <Link href="/login" className="hidden lg:block"> {/* Hide login button on small screens to save space */}
+                                <Link href="/site/login" className="hidden lg:block"> {/* Hide login button on small screens to save space */}
                                     <Button className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-full">
                                         <User className="w-4 h-4 mr-2" />
                                         Login
@@ -381,7 +381,7 @@ export default function Navbar() {
                                                     Wishlist ({wishlistCount})
                                                 </Link>
                                                 {/* Cart in Mobile */}
-                                                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-start p-3 rounded-lg border hover:bg-red-50 transition-colors">
+                                                <Link href="/site/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-start p-3 rounded-lg border hover:bg-red-50 transition-colors">
                                                     <ShoppingCart className="w-5 h-5 mr-2 text-gray-600" />
                                                     Cart ({cartItemsCount})
                                                 </Link>
@@ -389,7 +389,7 @@ export default function Navbar() {
                                             {/* Account/Login in Mobile */}
                                             {user ? (
                                                 <>
-                                                    <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center py-3 px-4 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                                                    <Link href="/site/account" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center py-3 px-4 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors">
                                                         <User className="w-5 h-5 mr-3" />
                                                         My Account
                                                     </Link>
@@ -399,7 +399,7 @@ export default function Navbar() {
                                                     </button>
                                                 </>
                                             ) : (
-                                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-left flex items-center py-3 px-4 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors">
+                                                <Link href="/site/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-left flex items-center py-3 px-4 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors">
                                                     <User className="w-5 h-5 mr-3" />
                                                     Login
                                                 </Link>

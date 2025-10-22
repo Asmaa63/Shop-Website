@@ -4,22 +4,22 @@ import Link from 'next/link';
 
 const footerLinks = {
   shop: [
-    { name: "New Arrivals", href: "/shop/new" },
-    { name: "Best Sellers", href: "/shop/popular" },
-    { name: "Sale Items", href: "/shop/sale" },
-    { name: "All Categories", href: "/shop" },
+    { name: "New Arrivals", href: "/site/shop/new" },
+    { name: "Best Sellers", href: "/site/shop/popular" },
+    { name: "Sale Items", href: "/site/shop/sale" },
+    { name: "All Categories", href: "/site/shop" },
   ],
   support: [
     { name: "FAQ", href: "/faq" },
-    { name: "Shipping & Returns", href: "/shipping" },
-    { name: "Order Tracking", href: "/tracking" },
-    { name: "Help Center", href: "/contact" },
+    { name: "Shipping & Returns", href: "/site/shipping" },
+    { name: "Order Tracking", href: "/site/tracking" },
+    { name: "Help Center", href: "/site/contact" },
   ],
   company: [
-    { name: "About Us", href: "/about" },
-    { name: "Our Blog", href: "/blog" },
-    { name: "Careers", href: "/careers" },
-    { name: "Terms & Conditions", href: "/terms" },
+    { name: "About Us", href: "/site/about" },
+    { name: "Our Blog", href: "/site/blog" },
+    { name: "Careers", href: "/site/careers" },
+    { name: "Terms & Conditions", href: "/site/terms" },
   ],
 };
 

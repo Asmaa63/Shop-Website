@@ -1,54 +1,86 @@
-import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
-import { Order, OrderItem } from '@/types/index.d';
-import { getServerSession } from 'next-auth'; 
-import { ObjectId } from 'mongodb'; // Import ObjectId for potential future use or type hinting
+import { NextResponse, NextRequest } from "next/server";
+import connectDB from "@/lib/mongoose";
+import Order from "@/models/Order";
 
-// POST /api/orders - Creates a new order
-export async function POST(request: NextRequest) {
-  
-  // You need to import and configure your next-auth options correctly
-  // const session = await getServerSession(authOptions); 
-  // if (!session || !session.user || !session.user.id) {
-  //   return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
-  // }
-  // const userId = session.user.id; 
-  
-  // NOTE: Mocking userId for now
-  const userId = 'MOCK_USER_ID'; 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  image?: string;
+  imageUrl?: string;
+}
 
+
+// GET - جلب كل الطلبات
+export async function GET() {
   try {
-    const client = await clientPromise;
-    const db = client.db('ecommerceDB');
-    const collection = db.collection<Order>('orders');
+    await connectDB();
+    const orders = await Order.find().sort({ createdAt: -1 });
+    return NextResponse.json({ orders });
+  } catch (error) {
+    console.error("❌ Error fetching orders:", error);
+    return NextResponse.json({ message: "Failed to fetch orders" }, { status: 500 });
+  }
+}
 
-    const body = await request.json();
+// POST - حفظ طلب جديد ✅
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
     
-    // 1. Construct the new Order document WITHOUT _id
-    const newOrder = {
-      userId: userId,
-      items: body.items as OrderItem[],
-      shippingAddress: body.shippingAddress,
-      totalAmount: body.totalAmount,
-      paymentMethod: body.paymentMethod,
-      status: 'processing',
-      createdAt: new Date(),
-    };
+    const body = await request.json();
+    const { userId, items, shippingAddress, totalAmount, status } = body;
 
-    // 2. Insert the order into the database
-    // The MongoDB driver correctly infers the type of the inserted document
-    const result = await collection.insertOne(newOrder as Order); 
+    // التحقق من البيانات الأساسية
+    if (!items || items.length === 0) {
+      return NextResponse.json(
+        { message: "Items are required" },
+        { status: 400 }
+      );
+    }
+
+    if (!shippingAddress) {
+      return NextResponse.json(
+        { message: "Shipping address is required" },
+        { status: 400 }
+      );
+    }
+
+    // إنشاء الطلب في قاعدة البيانات
+    const newOrder = await Order.create({
+      userId: userId || "guest",
+      items: items.map((item: OrderItem) => ({
+  name: item.name,
+  quantity: item.quantity,
+  price: item.price,
+  image: item.imageUrl || item.image,
+})),
+      shippingAddress: {
+        fullName: shippingAddress.fullName,
+        phone: shippingAddress.phone,
+        street: shippingAddress.street,
+        city: shippingAddress.city,
+        zipCode: shippingAddress.zipCode,
+        country: shippingAddress.country,
+      },
+      totalAmount,
+      status: status || "Pending",
+    });
 
     return NextResponse.json(
       { 
-        message: 'Order created successfully', 
-        orderId: result.insertedId.toString()
-      }, 
+        message: "Order created successfully",
+        orderId: newOrder._id,
+        order: newOrder 
+      },
       { status: 201 }
     );
 
   } catch (error) {
-    console.error('Error creating order:', error);
-    return NextResponse.json({ message: 'Failed to create order' }, { status: 500 });
+    console.error("❌ Error creating order:", error);
+    return NextResponse.json(
+      { message: "Failed to create order" },
+      { status: 500 }
+    );
   }
 }

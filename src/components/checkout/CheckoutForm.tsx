@@ -71,51 +71,88 @@ export default function CheckoutForm() {
   const paymentMethod = watch('paymentMethod');
 
   const onSubmit = async (data: CheckoutFormInputs) => {
-    if (items.length === 0) {
-      toast.error('Your cart is empty. Please add some items first.');
+  if (items.length === 0) {
+    toast.error('Your cart is empty. Please add some items first.');
+    return;
+  }
+
+  const order: Order = createOrderObject(data, items, totalPrice, shippingCost);
+
+  if (data.paymentMethod === 'cod') {
+  try {
+    // ✅ نحفظ الطلب في MongoDB عبر /api/orders
+    const response = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: "guest", // أو session?.user?.id لو عندك NextAuth
+        items,
+        shippingAddress: data.address,
+        totalAmount: totalPrice + shippingCost,
+        status: "Pending",
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error("Failed to save order:", result);
+      toast.error("Failed to save order to the database.");
       return;
     }
 
-    const order: Order = createOrderObject(data, items, totalPrice, shippingCost);
+    // ✅ نحفظه كمان محلياً (عشان يظهر في My Orders)
+    addOrder(order);
+    clearCart();
 
-    if (data.paymentMethod === 'cod') {
-      addOrder(order);
-      clearCart();
+    toast.success("Your order has been placed successfully! You will pay on delivery.");
 
-      toast.success('Your order has been placed successfully! You will pay on delivery.');
+    // ✅ تحويل للصفحة مع رقم الطلب
+    setTimeout(() => {
+      router.push(`/site/order-confirmation?orderId=${result.orderId}`);
+    }, 1000);
+  } catch (err) {
+    console.error("Error saving COD order:", err);
+    toast.error("An unexpected error occurred while saving your order.");
+  }
 
-      setTimeout(() => router.push(`/order-confirmation?orderId=EGP{order.id}`), 1000);
-      return;
-    }
+  return;
+}
 
-    toast.loading('Processing payment... Please wait.');
 
-    try {
-      const response = await fetch('/api/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items,
-          shippingAddress: data.address as ShippingAddress,
-          orderData: order,
-        }),
-      });
+  toast.loading('Processing payment... Please wait.');
 
-      const result = await response.json();
+  try {
+    // ✅ Save cart and shipping info before redirect
+    localStorage.setItem("cartItems", JSON.stringify(items));
+    localStorage.setItem("shippingAddress", JSON.stringify(data.address));
 
-      if (response.ok && result.url) {
-        toast.dismiss();
-        router.push(result.url);
-      } else {
-        toast.dismiss();
-        toast.error(result.message || 'Failed to initiate payment.');
-      }
-    } catch (error) {
+    const response = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: items,
+        shippingAddress: data.address as ShippingAddress,
+        orderData: order,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.url) {
       toast.dismiss();
-      toast.error('An unexpected error occurred during checkout.');
-      console.error('Checkout submission failed:', error);
+      router.push(result.url);
+    } else {
+      toast.dismiss();
+      toast.error(result.message || 'Failed to initiate payment.');
     }
-  };
+  } catch (error) {
+    toast.dismiss();
+    toast.error('An unexpected error occurred during checkout.');
+    console.error('Checkout submission failed:', error);
+  }
+};
+
 
   return (
     <motion.div

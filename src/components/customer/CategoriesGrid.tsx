@@ -9,7 +9,7 @@ const categories = [
     icon: "📱",
     itemCount: 234,
     bgColor: "from-blue-500 to-blue-600",
-    link: "/shop?category=electronics"
+    link: "/site/shop?category=electronics"
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const categories = [
     icon: "👔",
     itemCount: 456,
     bgColor: "from-pink-500 to-rose-600",
-    link: "/shop?category=fashion"
+    link: "/site/shop?category=fashion"
   },
   {
     id: 3,
@@ -25,7 +25,7 @@ const categories = [
     icon: "🏠",
     itemCount: 189,
     bgColor: "from-green-500 to-emerald-600",
-    link: "/shop?category=home"
+    link: "/site/shop?category=home"
   },
   {
     id: 4,
@@ -33,7 +33,7 @@ const categories = [
     icon: "⚽",
     itemCount: 298,
     bgColor: "from-orange-500 to-red-600",
-    link: "/shop?category=sports"
+    link: "/site/shop?category=sports"
   },
   {
     id: 5,
@@ -41,7 +41,7 @@ const categories = [
     icon: "📚",
     itemCount: 567,
     bgColor: "from-purple-500 to-indigo-600",
-    link: "/shop?category=books"
+    link: "/site/shop?category=books"
   },
   {
     id: 6,
@@ -49,7 +49,7 @@ const categories = [
     icon: "💄",
     itemCount: 342,
     bgColor: "from-yellow-500 to-amber-600",
-    link: "/shop?category=beauty"
+    link: "/site/shop?category=beauty"
   }
 ];
 
@@ -106,7 +106,7 @@ export default function CategoriesGrid() {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Link
-            href="/shop"
+            href="/site/shop"
             className="inline-block bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition-smooth"
           >
             View All Categories 
