@@ -52,8 +52,8 @@ Before you begin, ensure you have:
 
 1. **Clone the repository**
 ```bash
-git clone <your-repo-url>
-cd exclusive-ecommerce
+git clone https://github.com/Asmaa63/Shop-Website.git
+cd Shop-Website
 ```
 
 2. **Install dependencies**
