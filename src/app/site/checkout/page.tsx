@@ -22,27 +22,30 @@ const itemVariants = {
   visible: { opacity: 1, x: 0 },
 };
 
-const calculateShipping = (subtotal: number): number => {
-  if (subtotal < 2000) return 70;
-  if (subtotal >= 2000 && subtotal <= 3000) return 50;
-  return 0;
-};
-
 export default function CheckoutPage() {
-  const { items } = useCartStore((state) => ({
-    items: state.items,
+  const { selectedItems } = useCartStore((state) => ({
+    selectedItems: state.selectedItems,
   }));
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = calculateShipping(subtotal);
-  const orderTotal = subtotal + shipping;
+  const itemsTotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+  let shippingCost = 0;
+  if (itemsTotal > 0 && itemsTotal < 2000) {
+    shippingCost = 70;
+  } else if (itemsTotal >= 2000 && itemsTotal < 3000) {
+    shippingCost = 50;
+  } else if (itemsTotal >= 3000) {
+    shippingCost = 0;
+  }
 
-  if (items.length === 0) {
+  const orderTotal = itemsTotal + shippingCost;
+
+  if (selectedItems.length === 0) {
     return (
       <div className="container mx-auto py-20 text-center">
-        <h1 className="text-3xl font-bold mb-4">Your cart is empty!</h1>
-        <p className="text-gray-600 mb-6">Add items to your cart to proceed to checkout.</p>
-        <Button onClick={() => (window.location.href = "/")}>Continue Shopping</Button>
+        <h1 className="text-3xl font-bold mb-4">No items selected!</h1>
+        <p className="text-gray-600 mb-6">Please select items from your cart to proceed to checkout.</p>
+        <Button onClick={() => (window.location.href = "/site/cart")}>Go to Cart</Button>
       </div>
     );
   }
@@ -75,7 +78,7 @@ export default function CheckoutPage() {
           </h2>
 
           <ul className="space-y-3">
-            {items.map((item) => (
+            {selectedItems.map((item) => (
               <motion.li
                 key={item.id || `${item.name}-${Math.random()}`}
                 className="flex justify-between text-base"
@@ -96,12 +99,12 @@ export default function CheckoutPage() {
           <div className="space-y-2">
             <div className="flex justify-between text-lg font-medium">
               <span>Subtotal:</span>
-              <span>EGP{subtotal.toFixed(2)}</span>
+              <span>EGP {itemsTotal.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between text-base text-gray-600">
               <span>Shipping:</span>
-              <span>{shipping === 0 ? "FREE" : `EGP${shipping.toFixed(2)}`}</span>
+              <span>{shippingCost === 0 ? "FREE" : `EGP ${shippingCost.toFixed(2)}`}</span>
             </div>
           </div>
 
@@ -113,7 +116,7 @@ export default function CheckoutPage() {
             transition={{ type: "spring", stiffness: 300 }}
           >
             <span>Order Total:</span>
-            <span>EGP{orderTotal.toFixed(2)}</span>
+            <span>EGP {orderTotal.toFixed(2)}</span>
           </motion.div>
         </motion.div>
       </div>

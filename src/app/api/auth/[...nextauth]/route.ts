@@ -10,7 +10,6 @@ export const authOptions: AuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -22,7 +21,6 @@ export const authOptions: AuthOptions = {
         const db = client.db("my-shop");
 
         const user = await db.collection("users").findOne({ email: credentials?.email });
-
         if (!user) throw new Error("User not found");
 
         const isValid = await compare(credentials!.password, user.password);
@@ -38,11 +36,23 @@ export const authOptions: AuthOptions = {
   },
 
   session: {
-    strategy: "jwt" as const, // ✅ الحل هنا
+    strategy: "jwt",
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.id = user.id;
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) session.user.id = token.id;
+      return session;
+    },
   },
 
   secret: process.env.NEXTAUTH_SECRET!,
 };
+
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

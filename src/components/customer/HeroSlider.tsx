@@ -29,7 +29,7 @@ const slides = [
     id: 3,
     title: "Electronics Deal",
     subtitle: "Tech at Best Prices",
-    description: "Get the latest gadgets with exclusive discounts",
+    description: "Get the latest gadgets with ShopEC discounts",
     cta: "View Deals",
     link: "/site/shop?category=electronics",
     bgColor: "from-green-500 to-teal-500",

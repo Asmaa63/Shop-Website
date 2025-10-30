@@ -24,22 +24,22 @@ export default function ProductFilters({
   availableBrands,
 }: Props) {
   return (
-    <div className="bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row gap-3 items-center">
+    <div className="bg-white backdrop-blur-sm p-4 rounded-2xl border border-white flex flex-col sm:flex-row gap-3 items-center">
       <input
         value={search}
         onChange={(e: ChangeEvent<HTMLInputElement>) => onSearch(e.target.value)}
         placeholder="Search products, brands or categories..."
-        className="flex-1 bg-transparent border border-white/10 px-4 py-2 rounded-lg outline-none placeholder-gray-300"
+        className="flex-1 bg-transparent border border-white/10 px-4 py-2 rounded-lg outline-none placeholder-black"
       />
 
       <select
         value={category}
         onChange={(e) => onCategory(e.target.value)}
-        className="bg-transparent border border-white/10 px-3 py-2 rounded-lg outline-none"
+        className="bg-transparent border border-white/10 px-3 py-2 rounded-lg outline-none text-black"
       >
         <option value="">All Categories</option>
         {availableCategories.map((c) => (
-          <option key={c} value={c} className="bg-blue-700">
+          <option key={c} value={c} className="bg-gray-300">
             {c}
           </option>
         ))}
@@ -48,11 +48,11 @@ export default function ProductFilters({
       <select
         value={brand}
         onChange={(e) => onBrand(e.target.value)}
-        className="bg-transparent border border-white/10 px-3 py-2 rounded-lg outline-none "
+        className="bg-transparent border border-white/10 px-3 py-2 rounded-lg outline-none text-black "
       >
         <option value="" >All Brands</option>
         {availableBrands.map((b) => (
-          <option key={b} value={b} className="bg-blue-700" >
+          <option key={b} value={b} className="bg-gray-300" >
             {b}
           </option>
         ))}
@@ -64,7 +64,7 @@ export default function ProductFilters({
           onCategory("");
           onBrand("");
         }}
-        className="px-4 py-2 bg-gradient-to-r from-gray-700/40 to-gray-700/20 rounded-lg hover:opacity-90"
+        className="px-4 py-2 bg-gradient-to-r from-blue-300 to-blue-600 rounded-lg hover:opacity-90"
       >
         Reset
       </button>

@@ -86,7 +86,7 @@ useEffect(() => {
   return (
     <div className="text-white">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-semibold">Products</h1>
+        <h1 className="text-3xl font-semibold text-blue-600">Products</h1>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg"
@@ -97,9 +97,9 @@ useEffect(() => {
 
       {showModal && (
         <AddProductModal
-          onClose={() => setShowModal(false)} // ✅ يقفل المودال
+          onClose={() => setShowModal(false)} 
           onSave={() => {
-            fetchProducts(); // ✅ يحدث القائمة بعد الإضافة
+            fetchProducts(); 
             setShowModal(false);
           }}
         />
@@ -118,7 +118,7 @@ useEffect(() => {
 
       <div className="mt-6">
         {loading && (
-          <div className="text-center py-20 text-gray-300">Loading products…</div>
+          <div className="text-center py-20 text-blue-500">Loading products…</div>
         )}
 
         {error && (
@@ -126,7 +126,7 @@ useEffect(() => {
         )}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-300">No products found.</div>
+          <div className="text-center py-12 text-blue-00">No products found.</div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

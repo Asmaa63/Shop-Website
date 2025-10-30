@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, X } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 type Product = {
   id: string;
@@ -24,6 +25,8 @@ export default function ProductCard({
   product: Product;
   onDelete: () => void;
 }) {
+  const [toasts, setToasts] = useState<string[]>([]);
+
   const handleDelete = async () => {
     const confirmed = await new Promise((resolve) => {
       toast(
@@ -73,7 +76,27 @@ export default function ProductCard({
 
       if (!res.ok) throw new Error("Failed to delete");
 
-      toast.success("Product deleted successfully!", { id: loadingToast });
+      const successToast = toast.custom(
+        (t) => (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center justify-between bg-green-500 text-white px-4 py-3 rounded-lg shadow-md w-full max-w-sm"
+          >
+            <span>Product deleted successfully!</span>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="ml-3 p-1 hover:bg-green-600 rounded-full transition"
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        ),
+        { duration: 3000, id: loadingToast }
+      );
+
+      setToasts([...toasts, successToast?.toString() || ""]);
       onDelete();
     } catch (error) {
       toast.error("Failed to delete product", { id: loadingToast });
@@ -123,16 +146,18 @@ export default function ProductCard({
         </div>
 
         <div className="p-4">
-          <h3 className="font-semibold text-lg truncate">{product.name}</h3>
-          <p className="text-sm text-gray-300 mt-1 truncate">{product.brand}</p>
+          <h3 className="font-semibold text-lg truncate text-black">
+            {product.name}
+          </h3>
+          <p className="text-sm text-gray-600 mt-1 truncate">{product.brand}</p>
 
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <div className="text-xl font-bold text-green-400">
+              <div className="text-xl font-bold text-green-600">
                 EGP {product.price}
               </div>
               {product.originalPrice && (
-                <div className="text-sm line-through text-gray-400">
+                <div className="text-sm line-through text-gray-700">
                   EGP {product.originalPrice}
                 </div>
               )}
@@ -143,29 +168,29 @@ export default function ProductCard({
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 10 }}
                   whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-md bg-blue-600/20 hover:bg-blue-600/40 transition-all"
+                  className="p-2 rounded-md bg-blue-600/10 hover:bg-blue-600/20 transition-all"
                   title="Edit"
                 >
-                  <Edit size={18} className="text-blue-400" />
+                  <Edit size={18} className="text-blue-500" />
                 </motion.button>
               </Link>
               <motion.button
                 whileHover={{ scale: 1.1, rotate: -10 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleDelete}
-                className="p-2 rounded-md bg-red-600/20 hover:bg-red-600/40 transition-all"
+                className="p-2 rounded-md bg-red-600/10 hover:bg-red-600/20 transition-all"
                 title="Delete"
               >
-                <Trash2 size={18} className="text-red-400" />
+                <Trash2 size={18} className="text-red-500" />
               </motion.button>
             </div>
           </div>
 
-          <div className="mt-3 text-xs text-gray-400 flex items-center justify-between">
-            <span className="px-2 py-1 bg-purple-600/30 rounded">
+          <div className="mt-3 text-xs text-gray-300 flex items-center justify-between">
+            <span className="px-2 py-1 bg-purple-400 rounded">
               {product.category}
             </span>
-            <span className="px-2 py-1 bg-blue-600/30 rounded">
+            <span className="px-2 py-1 bg-blue-400 rounded">
               {product.subcategory}
             </span>
           </div>

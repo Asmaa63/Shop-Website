@@ -422,7 +422,7 @@ export default function SettingsPage() {
                   {
                     key: "promotions",
                     title: "Promotions & Deals",
-                    description: "Receive exclusive offers and discounts",
+                    description: "Receive ShopEC offers and discounts",
                     icon: "🎁",
                   },
                   {

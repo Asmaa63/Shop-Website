@@ -3,10 +3,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { User, Mail, Lock, CheckCircle } from "lucide-react";
+import {
+  User,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import { motion } from "framer-motion";
-
-
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,8 +22,32 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
+  const [termsChecked, setTermsChecked] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const passwordRequirements = [
+    { id: 1, label: "At least 6 characters", test: (p: string) => p.length >= 6 },
+    { id: 2, label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+    { id: 3, label: "One lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+    { id: 4, label: "One number", test: (p: string) => /[0-9]/.test(p) },
+    { id: 5, label: "One special character", test: (p: string) => /[!@#$%^&*(),.?\":{}|<>]/.test(p) },
+  ];
+
+  const isPasswordValid = passwordRequirements.every((r) =>
+    r.test(formData.password)
+  );
+
+  const allFieldsFilled =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.password.trim() &&
+    formData.confirmPassword.trim();
+
+  const isFormValid =
+    allFieldsFilled && isPasswordValid && formData.password === formData.confirmPassword && termsChecked;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -28,20 +58,11 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) return;
+
     setError("");
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
     setLoading(true);
-
     try {
       const response = await fetch("/api/users/register", {
         method: "POST",
@@ -96,7 +117,7 @@ export default function RegisterPage() {
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Left Side - Info Section */}
+        {/* Left Info Section */}
         <motion.div
           className="hidden lg:block"
           initial={{ x: -50, opacity: 0 }}
@@ -111,14 +132,14 @@ export default function RegisterPage() {
             />
             <h2 className="text-4xl font-bold mb-6">Join Our Community</h2>
             <p className="text-lg mb-10 text-blue-100 leading-relaxed">
-              Create an account to access exclusive deals, faster checkout, and
+              Create an account to access ShopEC deals, faster checkout, and
               a personalized shopping experience.
             </p>
             <div className="space-y-5">
               {[
                 "Fast & Secure Checkout",
                 "Track Your Orders",
-                "Exclusive Member Deals",
+                "ShopEC Member Deals",
                 "Personalized Experience",
               ].map((text, i) => (
                 <motion.div
@@ -136,7 +157,7 @@ export default function RegisterPage() {
           </div>
         </motion.div>
 
-        {/* Right Side - Register Form */}
+        {/* Register Form */}
         <motion.div
           className="bg-white rounded-3xl shadow-xl p-8 sm:p-12"
           initial={{ x: 50, opacity: 0 }}
@@ -176,97 +197,156 @@ export default function RegisterPage() {
               </motion.div>
             )}
 
-            {[
-              {
-                id: "name",
-                icon: <User className="h-5 w-5 text-gray-400" />,
-                type: "text",
-                placeholder: "Asmaa Sharf",
-                label: "Full Name",
-              },
-              {
-                id: "email",
-                icon: <Mail className="h-5 w-5 text-gray-400" />,
-                type: "email",
-                placeholder: "you@gmail.com",
-                label: "Email Address",
-              },
-              {
-                id: "password",
-                icon: <Lock className="h-5 w-5 text-gray-400" />,
-                type: "password",
-                placeholder: "Min. 6 characters",
-                label: "Password",
-              },
-              {
-                id: "confirmPassword",
-                icon: <Lock className="h-5 w-5 text-gray-400" />,
-                type: "password",
-                placeholder: "Confirm your password",
-                label: "Confirm Password",
-              },
-            ].map(({ id, icon, type, placeholder, label }) => (
-              <motion.div
-                key={id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <label
-                  htmlFor={id}
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  {label}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    {icon}
-                  </div>
-                  <input
-                    id={id}
-                    name={id}
-                    type={type}
-                    required
-                    value={formData[id as keyof typeof formData]}
-                    onChange={handleChange}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
-                    placeholder={placeholder}
-                  />
-                </div>
-              </motion.div>
-            ))}
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="block w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="your name"
+                />
+              </div>
+            </div>
 
-            <div className="flex items-start">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="you@gmail.com"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full pl-12 pr-12 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="Min. 6 characters"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
+              {/* Password requirements */}
+              <ul className="mt-3 space-y-1 text-sm">
+                {passwordRequirements.map((req) => {
+                  const valid = req.test(formData.password);
+                  return (
+                    <motion.li
+                      key={req.id}
+                      className={`flex items-center gap-2 ${
+                        valid ? "text-green-600" : "text-gray-500"
+                      }`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      {valid ? (
+                        <CheckCircle size={16} className="text-green-600" />
+                      ) : (
+                        <XCircle size={16} className="text-gray-400" />
+                      )}
+                      {req.label}
+                    </motion.li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="block w-full pl-12 pr-12 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="Confirm your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Terms Checkbox */}
+            <div className="flex items-center">
               <input
                 id="terms"
+                name="terms"
                 type="checkbox"
-                required
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
+                checked={termsChecked}
+                onChange={(e) => setTermsChecked(e.target.checked)}
+                className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-              <label htmlFor="terms" className="ml-3 text-sm text-gray-700">
+              <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
                 I agree to the{" "}
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 hover:text-purple-600"
+                <Link
+                  href="/site/terms"
+                  className="text-blue-600 hover:underline font-medium transition-all"
                 >
-                  Terms and Conditions
-                </a>{" "}
-                and{" "}
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 hover:text-purple-600"
-                >
-                  Privacy Policy
-                </a>
+                  Terms & Conditions
+                </Link>
               </label>
             </div>
 
+            {/* Submit Button */}
             <motion.button
               type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-[1.03]"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              disabled={!isFormValid || loading}
+              className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-base font-semibold text-white transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                isFormValid
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  : "bg-gray-300 cursor-not-allowed opacity-60"
+              }`}
+              whileHover={{ scale: isFormValid ? 1.03 : 1 }}
+              whileTap={{ scale: isFormValid ? 0.97 : 1 }}
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -296,6 +376,7 @@ export default function RegisterPage() {
               )}
             </motion.button>
 
+            {/* Google Sign In */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />

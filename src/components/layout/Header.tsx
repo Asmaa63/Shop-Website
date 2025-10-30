@@ -37,11 +37,10 @@ import { useWishlistStore } from "@/store/wishlistStore";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const categories = [
-    { name: "Electronics", href: "/site/shop?category=electronics" },
-    { name: "Fashion", href: "/site/shop?category=fashion" },
-    { name: "Home & Garden", href: "/site/shop?category=home" },
-    { name: "Sports", href: "/site/shop?category=sports" },
-    { name: "Books", href: "/site/shop?category=books" },
+  { name: "Electronics", href: "/site/shop?category=Electronics" },
+  { name: "Fashion", href: "/site/shop?category=Fashion" },
+  { name: "Home & Garden", href: "/site/shop?category=Home%20%26%20Garden" },
+  { name: "Sports & Outdoors", href: "/site/shop?category=Sports%20%26%20Outdoors" },
 ];
 
 const mainLinks = [
@@ -125,7 +124,7 @@ export default function Navbar() {
                             </div>
                             <div className="flex items-center gap-2">
                                 <Mail className="w-4 h-4" />
-                                <span className="hidden lg:inline">support@exclusive.com.eg</span>
+                                <span className="hidden lg:inline">support@ShopEC.com.eg</span>
                             </div>
                         </div>
                     </div>
@@ -153,13 +152,14 @@ export default function Navbar() {
                                     <ShoppingCart className="w-6 h-6 text-white" />
                                 </div>
                                 <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
-                                    Exclusive
+                                    ShopEC
                                 </span>
                             </motion.div>
                         </Link>
 
                         {/* Desktop Links */}
-                        <div className="hidden lg:flex items-center gap-8">
+                        <div className="hidden custom900:flex items-center gap-8">
+
                             {mainLinks.map((link, index) => (
                                 <motion.div
                                     key={link.path}
@@ -204,7 +204,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Search Bar (Desktop/Tablet) */}
-                        <div className="hidden md:flex flex-1 max-w-sm">
+                        <div className="hidden lg:flex flex-1 max-w-sm">
                             <form onSubmit={handleSearch} className="relative w-full">
                                 <Input
                                     type="text"
@@ -313,8 +313,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Search, Cart, Menu Icons for Mobile (visible on small screens) */}
-                        <div className="flex items-center gap-2 md:hidden">
-                            {/* Mobile Search Icon */}
+                        <div className="flex items-center gap-2 custom900:hidden">                            {/* Mobile Search Icon */}
                             <Button
                                 variant="ghost"
                                 size="icon"

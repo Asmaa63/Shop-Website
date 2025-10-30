@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Package, Eye, Download, Truck, CheckCircle, Clock, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -83,6 +84,8 @@ export default function OrdersPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [filter, setFilter] = useState<string>("all");
 
+    const { data: session, status } = useSession();
+
     useEffect(() => {
         const fetchOrders = async () => {
             try {
@@ -106,7 +109,15 @@ export default function OrdersPage() {
         };
 
         fetchOrders();
-    }, []);
+    }, [status]);
+
+    if (status === "loading") {
+    return <p className="text-center mt-20 text-gray-600">Loading session...</p>;
+  }
+
+  if (!session) {
+    return <p className="text-center mt-20 text-gray-600">Please log in to view your orders.</p>;
+  }
 
     const filteredOrders = orders.filter((order) =>
         filter === "all" 

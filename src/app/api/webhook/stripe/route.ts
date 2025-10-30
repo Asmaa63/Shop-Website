@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
         errorMessage = (err as { message: string }).message;
     }
     
-    console.error(`Webhook signature verification failed: EGP{errorMessage}`);
     return new NextResponse(`Webhook Error: EGP{errorMessage}`, { status: 400 });
   }
 
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     
     if (!session.metadata || !session.metadata.shipping_address) {
-        console.error('Missing required metadata in session.');
         return new NextResponse('Missing metadata', { status: 400 });
     }
 
@@ -89,10 +87,7 @@ export async function POST(request: NextRequest) {
       // 5. Save the Order to MongoDB
       await orderCollection.insertOne(newOrder as Order);
       
-      console.log(`Order created successfully for session: EGP{session.id}`);
-
     } catch (dbError) {
-      console.error('Database Error during order creation:', dbError);
       return new NextResponse('Database Error', { status: 500 });
     }
   }

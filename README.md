@@ -1,139 +1,275 @@
-# 🛍️ Exclusive E-Commerce Platform
+# 🛍️ ShopEC E-Commerce Platform
 
-## 🌟 Overview
+A full-stack e-commerce platform built with Next.js 15, featuring a complete admin dashboard, customer shopping interface, and secure payment processing via Stripe.
 
-This is a modern, full-stack **E-commerce Platform** built for high performance and an exceptional user experience. Utilizing the robustness of **Next.js** and the efficiency of **TypeScript**, the project features complete user authentication, global state management, and a component-driven design powered by **Shadcn UI** primitives.
+## ✨ Features
 
-It is designed as a scalable solution for a dynamic online shop, ready to handle product listings, user accounts, and secure transactions.
+### Customer Features
+- 🏠 Modern responsive storefront
+- 🔍 Product browsing and search
+- 🛒 Shopping cart functionality
+- ❤️ Wishlist management
+- 👤 User account management
+- 📦 Order tracking and history
+- 💳 Secure checkout with Stripe
+- 📍 Multiple shipping addresses
+- 📱 Fully responsive design
 
----
+### Admin Features
+- 📊 Comprehensive dashboard
+- 📦 Product management (CRUD operations)
+- 👥 User management
+- 🛍️ Order management and tracking
+- 💬 Customer messages/inquiries
+- ⚙️ Settings and configuration
+- 📈 Analytics and reporting
 
-**🚀 Live Demo:** [https://shop-website-bay.vercel.app/](https://shop-website-bay.vercel.app/)
+## 🚀 Tech Stack
 
----
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Database:** MongoDB with Mongoose
+- **Authentication:** NextAuth.js v4
+- **Payment:** Stripe
+- **UI Components:** Radix UI
+- **Styling:** Tailwind CSS
+- **Forms:** React Hook Form + Zod
+- **State Management:** Zustand
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
 
-## ✨ Key Features
+## 📋 Prerequisites
 
-* **Full User Authentication:** Secure sign-up, login, and session management using **NextAuth.js**.
-* **State Management:** Global state handling with **Zustand** for complex application data.
-* **Data Validation:** Form validation and schema definition using **Zod** and **React Hook Form**.
-* **MongoDB Integration:** Persistent and scalable data storage using **MongoDB**.
-* **Modern UI/UX:** Built with **Tailwind CSS** and **Shadcn UI** primitives for a clean, responsive, and accessible interface.
-* **Animated Interactions:** Enhanced user experience with fluid animations powered by **Framer Motion**.
-* **Transaction/User Feedback:** Toast notifications and alerts managed by **Sonner**.
+Before you begin, ensure you have:
 
-## 📁 Project Structure
+- Node.js 18+ installed
+- MongoDB database (local or MongoDB Atlas)
+- Stripe account (test keys)
+- Gmail account (for email notifications)
+- Google OAuth credentials (optional)
 
-The project follows the standard Next.js App Router structure, enhanced with dedicated directories for components, services, and state management logic.
+## 🔧 Installation
 
-## 📁 Project Structure
+1. **Clone the repository**
+```bash
+git clone <your-repo-url>
+cd exclusive-ecommerce
+```
 
-The project follows the standard Next.js App Router structure, enhanced with dedicated directories for components, services, and state management logic.
+2. **Install dependencies**
+```bash
+npm install
+```
 
-├── public/                       # Static assets (images, fonts, favicons)
-├── src/
-│   ├── app/                      # Next.js App Router (Pages & Layouts)
-│   │   ├── (auth)/               # Grouped routes for authentication (login, signup)
-│   │   ├── api/                  # API Routes (Next.js backend)
-│   │   ├── [product_slug]/       # Dynamic product pages
-│   │   ├── layout.tsx            # Global layout structure
-│   │   └── page.tsx              # Home page
-│   ├── components/               # Reusable UI components
-│   │   ├── ui/                   # Shadcn UI primitives (Button, Card, Input, etc.)
-│   │   └── global/               # Larger components (Header, Footer, Cart)
-│   ├── lib/                      # Helper functions and utilities
-│   │   ├── utils.ts              # Utility functions (e.g., for tailwind-merge)
-│   │   └── validation/           # Zod schemas for validation
-│   ├── providers/                # Context and Providers (e.g., AuthProvider, QueryClientProvider)
-│   ├── hooks/                    # Custom React Hooks
-│   ├── store/                    # Zustand store definitions for global state
-│   ├── types/                    # TypeScript type definitions (interfaces, types)
-│   └── styles/                   # Global styles and Tailwind configuration
-├── .env.local                    # Environment variables (MUST be created locally)
-├── next.config.js                # Next.js configuration
-├── package.json                  # Project dependencies and scripts
-├── tailwind.config.js            # Tailwind CSS configuration
-└── tsconfig.json                 # TypeScript configuration
+3. **Configure environment variables**
 
-## 🛠️ Technology Stack & Dependencies 
-The project leverages a robust and modern stack, focusing on security, performance, and developer experience.
+Create a `.env.local` file in the root directory:
 
-### Core Technologies
+```env
+# ========================================================
+# EMAIL SERVICE
+# ========================================================
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-app-password
+EMAIL_FROM=noreply@exclusive.com
 
-| Category | Technology | Description |
-| :--- | :--- | :--- |
-| **Framework** | **Next.js 15+** | The React framework for server-side rendering (SSR), routing, and API endpoints. |
-| **Language** | **TypeScript** | Enhances code quality and reliability with static typing. |
-| **Styling** | **Tailwind CSS** | Utility-first framework for rapid and responsive custom styling. |
-| **Database** | **MongoDB** | A NoSQL database for flexible and scalable data storage. |
+# ========================================================
+# DATABASE (MongoDB)
+# ========================================================
+MONGODB_URI=your-mongodb-connection-string
 
-### Major Dependencies
+# ========================================================
+# AUTHENTICATION (NextAuth.js)
+# ========================================================
+NEXTAUTH_SECRET=your-random-secret-key
+NEXTAUTH_URL=http://localhost:3000
 
-| Purpose | Tool / Library | Key Use |
-| :--- | :--- | :--- |
-| **Authentication** | **NextAuth.js** | Handles secure user authentication, sessions, and social logins. |
-| **Database Adapter** | **`@next-auth/mongodb-adapter`** | Connects NextAuth.js to the MongoDB database. |
-| **State Management** | **Zustand** | A fast, simple, and scalable state management solution. |
-| **Form Handling** | **`react-hook-form`** & **`@hookform/resolvers`** | Manages form state, validation, and submission with high performance. |
-| **Schema Validation** | **Zod** | TypeScript-first schema declaration and validation library. |
-| **UI Components** | **`@radix-ui/*` (Shadcn UI)** | Accessible, unstyled component primitives for building custom interfaces (e.g., Dialog, Dropdown, Select, Slider). |
-| **Animations** | **Framer Motion** | A production-ready animation library for React. |
-| **Utility Icons** | **lucide-react** | A large collection of beautiful, community-driven SVG icons. |
-| **Security** | **bcryptjs** | Used for hashing passwords securely. |
-| **Email Service** | **nodemailer** | Simplifies sending emails (e.g., for password resets or order confirmations). |
-| **Fetching/Caching** | **`@tanstack/react-query`** | Manages server state, caching, and background data fetching. |
-| **Toasts/Alerts** | **sonner** | Beautiful, accessible, and customizable toast component. |
+# Google OAuth (Optional)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-## 🚀 Getting Started
+# ========================================================
+# PAYMENT (Stripe - Test Keys)
+# ========================================================
+STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
+NEXT_PUBLIC_VERCEL_URL=http://localhost:3000
+STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
 
-Follow these steps to set up the project locally on your machine.
+# ========================================================
+# ADMIN LOGIN
+# ========================================================
+NEXT_PUBLIC_ADMIN_USER=admin
+NEXT_PUBLIC_ADMIN_PASS=your-secure-password
+```
 
-### Prerequisites
-
-* Node.js (LTS version recommended)
-* A MongoDB connection string (e.g., from MongoDB Atlas or a local instance).
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/Asmaa63/Shop-Website.git](https://github.com/Asmaa63/Shop-Website.git)
-    cd Shop-Website
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
-    ```
-
-3.  **Configure Environment Variables:**
-    Create a file named `.env.local` in the root directory and add your environment variables, including your MongoDB connection URI and NextAuth secret.
-
-    ```bash
-    # NextAuth Configuration
-    NEXTAUTH_SECRET="your_strong_secret_key"
-    NEXTAUTH_URL="http://localhost:3000"
-
-    # Database Configuration
-    MONGODB_URI="mongodb+srv://<user>:<password>@<cluster-url>/<db-name>?retryWrites=true&w=majority"
-
-    # Email Configuration (for Nodemailer)
-    EMAIL_SERVER_USER="your_email_user"
-    EMAIL_SERVER_PASSWORD="your_email_password"
-    EMAIL_FROM="noreply@example.com"
-    ```
-
-### Running the Development Server
-
-Start the application in development mode:
-
+4. **Run the development server**
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+```
+
+5. **Open your browser**
+Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📁 Project Structure
+
+```
+exclusive-ecommerce/
+├── app/
+│   ├── admin/              # Admin dashboard routes
+│   │   ├── home/
+│   │   ├── products/
+│   │   ├── orders/
+│   │   ├── users/
+│   │   ├── messages/
+│   │   └── settings/
+│   ├── site/               # Customer-facing routes
+│   │   ├── shop/
+│   │   ├── cart/
+│   │   ├── checkout/
+│   │   ├── account/
+│   │   └── product/
+│   └── api/                # API routes
+│       ├── products/
+│       ├── orders/
+│       ├── users/
+│       ├── payment/
+│       └── webhook/
+├── components/             # Reusable components
+├── lib/                    # Utilities and configurations
+├── models/                 # MongoDB schemas
+├── public/                 # Static assets
+├── styles/                 # Global styles
+└── types/                  # TypeScript types
+```
+
+## 🌐 Routes Overview
+
+### Customer Routes
+- `/site` - Home page
+- `/site/shop` - Product catalog
+- `/site/product/[id]` - Product details
+- `/site/cart` - Shopping cart
+- `/site/checkout` - Checkout process
+- `/site/account` - User dashboard
+- `/site/account/orders` - Order history
+- `/site/account/settings` - Account settings
+- `/site/login` - User login
+- `/site/register` - User registration
+
+### Admin Routes
+- `/admin` - Admin dashboard home
+- `/admin/products` - Product management
+- `/admin/orders` - Order management
+- `/admin/users` - User management
+- `/admin/messages` - Customer inquiries
+- `/admin/settings` - Platform settings
+- `/admin/login` - Admin login
+
+## 🔐 Authentication
+
+The platform supports multiple authentication methods:
+
+1. **Email/Password** - Traditional authentication
+2. **Google OAuth** - Social login (optional)
+3. **NextAuth.js** - Secure session management
+
+### Admin Access
+- URL: `/admin/login`
+- Default credentials are set in `.env.local`
+- Change default credentials before production deployment
+
+## 💳 Payment Integration
+
+Stripe is integrated for payment processing:
+
+1. **Test Mode**: Uses test keys by default
+2. **Webhook**: Configure webhook endpoint for order updates
+3. **Supported**: Credit cards, digital wallets
+
+### Stripe Webhook Setup
+```bash
+stripe listen --forward-to localhost:3000/api/webhook/stripe
+```
+
+## 📧 Email Configuration
+
+Email notifications are sent via SMTP (Gmail):
+
+1. Enable 2-factor authentication on Gmail
+2. Generate an App Password
+3. Add credentials to `.env.local`
+
+## 🚀 Deployment
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Start Production Server
+```bash
+npm start
+```
+
+### Deploy to Vercel
+1. Push code to GitHub
+2. Import project in Vercel
+3. Configure environment variables
+4. Deploy
+
+**Important:** Update these environment variables for production:
+- `NEXTAUTH_URL` - Your production domain
+- `NEXT_PUBLIC_VERCEL_URL` - Your production domain
+- `STRIPE_SECRET_KEY` - Live Stripe key
+- `STRIPE_WEBHOOK_SECRET` - Production webhook secret
+
+## 🔒 Security Notes
+
+- ⚠️ **Never commit `.env.local`** to version control
+- 🔑 Change default admin credentials immediately
+- 🛡️ Use strong passwords for all services
+- 🔐 Enable 2FA where available
+- 📝 Regularly update dependencies
+- 🚨 Use live Stripe keys only in production
+
+## 📦 Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm start            # Start production server
+npm run lint         # Run ESLint
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check documentation in `/docs`
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- Vercel for hosting solutions
+- Stripe for payment processing
+- All open-source contributors
+
+---
+
+**Built with ❤️ using Next.js 15**

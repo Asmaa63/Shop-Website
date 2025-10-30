@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/cartStore";
 import { Product } from "@/lib/types";
 import { Plus, Minus, ShoppingCart } from "lucide-react";
+import ReviewSection from "@/components/customer/ReviewSection";
 
 interface ProductDetailsProps {
   product: Product;
@@ -31,7 +31,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
     setIsAdding(true);
 
-    // ✅ Add product with selected options
     const productWithSelections = {
       ...product,
       selectedColor,
@@ -84,29 +83,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
           <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
 
-          {/* ⭐ Rating */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <span
-                  key={i}
-                  className={`text-lg ${
-                    i < Math.floor(product.rating ?? 0)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-            <span className="text-lg font-medium">{product.rating}</span>
-            <span className="text-gray-600">
-              ({product.reviewCount} reviews)
-            </span>
-          </div>
-
-          {/* 💰 Prices */}
           <div className="flex items-center gap-4">
             <span className="text-3xl font-bold text-gray-900">
               EGP {product.price}
@@ -123,7 +99,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             )}
           </div>
 
-          {/* 🟢 Stock */}
           <div className="flex items-center gap-2">
             <div
               className={`w-3 h-3 rounded-full ${
@@ -141,58 +116,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             </span>
           </div>
 
-          {/* 📝 Description */}
           <p className="text-gray-700 leading-relaxed">{product.description}</p>
 
-          {/* 🎨 Colors */}
-          {product.colors && product.colors.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">
-                Color: {selectedColor}
-              </h3>
-              <div className="flex gap-3">
-                {product.colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 rounded-lg border transition-all ${
-                      selectedColor === color
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 📏 Sizes */}
-          {product.sizes && product.sizes.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-3">
-                Size: {selectedSize}
-              </h3>
-              <div className="flex gap-3">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-lg border transition-all ${
-                      selectedSize === size
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 🛒 Add to Cart / Quantity Controls */}
           <div className="flex gap-4">
             {isAddedToCart ? (
               <div className="flex items-center border border-gray-300 rounded-lg">
@@ -227,7 +152,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             )}
           </div>
 
-          {/* 🚚 Info */}
           <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200">
             <div className="flex items-center gap-2 text-sm text-gray-700">
               <span>🚚</span>
@@ -242,6 +166,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               <span>Easy Returns</span>
             </div>
           </div>
+
+          <ReviewSection productId={product.id} />
         </div>
       </div>
     </div>

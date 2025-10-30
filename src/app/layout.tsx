@@ -9,28 +9,28 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Exclusive | Premium E-Commerce Store for Fashion and Tech",
-    template: "%s | Exclusive Store",
+    default: "ShopEC | Premium E-Commerce Store for Fashion and Tech",
+    template: "%s | ShopEC Store",
   },
   description:
-    "Discover Exclusive's curated collection of modern fashion, smart electronics, and home essentials. Shop the best quality products with exclusive offers.",
+    "Discover ShopEC's curated collection of modern fashion, smart electronics, and home essentials. Shop the best quality products with ShopEC offers.",
   keywords: [
     "e-commerce store",
     "online shopping",
     "fashion",
     "electronics",
     "best deals",
-    "Exclusive",
+    "ShopEC",
   ],
   openGraph: {
-    title: "Exclusive Store | Your Luxury Shopping Destination",
-    description: "Explore the latest deals and exclusive products from Exclusive.",
+    title: "ShopEC Store | Your Luxury Shopping Destination",
+    description: "Explore the latest deals and ShopEC products from ShopEC.",
     url: "https://your-domain.com",
-    siteName: "Exclusive",
+    siteName: "ShopEC",
     images: [
       {
         url: "https://your-domain.com/og-image.jpg",
-        alt: "Exclusive E-Commerce Store Banner",
+        alt: "ShopEC E-Commerce Store Banner",
       },
     ],
     locale: "en_US",

@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   const product = await getProduct(params.id);
   if (!product) {
     return {
-      title: "Product Not Found | Exclusive Store",
+      title: "Product Not Found | ShopEC Store",
       description: "The product you are looking for does not exist.",
     };
   }
 
   return {
-    title: `${product.name} | Exclusive Store`,
+    title: `${product.name} | ShopEC Store`,
     description: product.description?.slice(0, 150) || "",
   };
 }

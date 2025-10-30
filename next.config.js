@@ -18,10 +18,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  swcMinify: true,
-  experimental: {
-    legacyBrowsers: false, 
-  },
+  reactStrictMode: true, 
 };
 
 module.exports = nextConfig;

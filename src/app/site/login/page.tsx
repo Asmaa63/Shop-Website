@@ -2,17 +2,21 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { startTransition } from "react";
 import Link from "next/link";
-import { Mail, Lock, ShoppingBag } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast, Toaster } from "react-hot-toast";
+
 export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -23,28 +27,32 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
-    try {
-      const result = await signIn("credentials", {
-  email: formData.email,
-  password: formData.password,
-  redirect: false,
-  callbackUrl: "/site/account",
-});
+    const result = await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    });
 
-      if (result?.error) {
-  setError(result.error);
-} else if (result?.ok) {
-  router.push(result.url || "/site/account");
-}
+    if (result?.error) {
+      toast.error(result.error);
+    } else if (result?.ok) {
+  toast.success("Signed in successfully!");
+  if (remember) {
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+    document.cookie = `rememberEmail=${formData.email}; expires=${expiryDate.toUTCString()}; path=/`;
+  }
 
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+  setTimeout(() => {
+    window.location.href = "/site/account";
+  }, 500);
+} else {
+      toast.error("Something went wrong. Please try again.");
     }
+
+    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -53,13 +61,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <Toaster position="top-center" />
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"
       >
-        {/* Left Side - Form */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -94,17 +102,6 @@ export default function LoginPage() {
             </p>
 
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg"
-                >
-                  <p className="font-medium">Error</p>
-                  <p className="text-sm">{error}</p>
-                </motion.div>
-              )}
-
               <div>
                 <label
                   htmlFor="email"
@@ -143,13 +140,24 @@ export default function LoginPage() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-base"
+                    className="block w-full pl-12 pr-12 py-3.5 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-base"
                     placeholder="Enter your password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -159,9 +167,11 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
                     className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
-                  Remember me
+                  Remember me (1 month)
                 </label>
 
                 <a
@@ -249,7 +259,6 @@ export default function LoginPage() {
           </div>
         </motion.div>
 
-        {/* Right Side - Illustration */}
         <motion.div
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -258,26 +267,19 @@ export default function LoginPage() {
         >
           <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden">
             <motion.div
-              animate={{
-                y: [0, -20, 0],
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 4,
-                ease: "easeInOut",
-              }}
+              animate={{ y: [0, -20, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
               className="absolute -top-16 -left-16 w-72 h-72 bg-white/10 rounded-full blur-3xl"
             />
             <h2 className="text-4xl font-bold mb-6">Welcome Back!</h2>
             <p className="text-lg mb-8 text-indigo-100 leading-relaxed">
-              Sign in to your account and continue shopping for amazing
-              products.
+              Sign in to your account and continue shopping for amazing products.
             </p>
             <div className="space-y-6">
               {[
                 {
                   icon: "🎉",
-                  title: "Exclusive Offers",
+                  title: "ShopEC Offers",
                   desc: "Get member-only deals and rewards.",
                 },
                 {

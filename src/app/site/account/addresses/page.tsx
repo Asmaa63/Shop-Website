@@ -303,7 +303,7 @@ export default function AddressesPage() {
                     value={formData.name || ""}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="mt-2 h-11 rounded-lg"
-                    placeholder="Asmaa sharf"
+                    placeholder="your name"
                   />
                 </div>
                 <div>

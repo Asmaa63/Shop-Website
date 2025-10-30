@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useCartStore } from "@/store/cartStore";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface CartItem {
   id: string;
@@ -24,16 +25,46 @@ const calculateShipping = (subtotal: number): number => {
 };
 
 export default function CartPage() {
-  const { items: rawItems, updateItemQuantity, removeItem, clearCart } = useCartStore();
+  const { items: rawItems, updateItemQuantity, removeItem, clearCart, setSelectedItems } = useCartStore();
   const items = rawItems as unknown as CartItem[];
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(items.map(item => item.id)));
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const selectedItems = useMemo(() => 
+    items.filter(item => selectedIds.has(item.id)),
+    [items, selectedIds]
+  );
+
+  const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = appliedCoupon ? subtotal * 0.1 : 0;
   const shipping = calculateShipping(subtotal - discount);
   const total = subtotal - discount + shipping;
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === items.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(items.map(item => item.id)));
+    }
+  };
+
+  const handleProceedToCheckout = () => {
+    setSelectedItems(selectedItems);
+  };
 
   const applyCoupon = () => {
     if (couponCode.toLowerCase() === "save10") {
@@ -89,6 +120,23 @@ export default function CartPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white rounded-2xl shadow-lg p-4 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={selectedIds.size === items.length && items.length > 0}
+                  onCheckedChange={toggleSelectAll}
+                  className="w-5 h-5"
+                />
+                <span className="font-semibold text-gray-700">
+                  Select All ({selectedIds.size} of {items.length} selected)
+                </span>
+              </div>
+            </motion.div>
+
             <AnimatePresence>
               {items.map((item, index) => (
                 <motion.div
@@ -97,70 +145,82 @@ export default function CartPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow"
+                  className={`bg-white rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-shadow ${
+                    selectedIds.has(item.id) ? 'ring-2 ring-blue-500' : ''
+                  }`}
                 >
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="relative w-full sm:w-32 h-40 sm:h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0"
-                    >
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
+                  <div className="flex gap-4">
+                    <div className="flex items-start pt-2">
+                      <Checkbox
+                        checked={selectedIds.has(item.id)}
+                        onCheckedChange={() => toggleSelection(item.id)}
+                        className="w-5 h-5"
                       />
-                    </motion.div>
+                    </div>
 
-                    <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-800 mb-1">
-                            {item.name}
-                          </h3>
-                          <p className="text-sm text-gray-500">{item.category}</p>
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1, rotate: 10 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-600 transition-colors self-end sm:self-start"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </motion.button>
-                      </div>
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 flex-1">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="relative w-full sm:w-32 h-40 sm:h-32 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0"
+                      >
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </motion.div>
 
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-3 bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
+                      <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
+                          <div>
+                            <h3 className="font-bold text-lg text-gray-800 mb-1">
+                              {item.name}
+                            </h3>
+                            <p className="text-sm text-gray-500">{item.category}</p>
+                          </div>
                           <motion.button
-                            whileHover={{ scale: 1.1 }}
+                            whileHover={{ scale: 1.1, rotate: 10 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                            className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center disabled:opacity-50"
+                            onClick={() => removeItem(item.id)}
+                            className="text-red-500 hover:text-red-600 transition-colors self-end sm:self-start"
                           >
-                            <Minus className="w-4 h-4" />
-                          </motion.button>
-                          <span className="w-8 text-center font-semibold">
-                            {item.quantity}
-                          </span>
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                            className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center"
-                          >
-                            <Plus className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5" />
                           </motion.button>
                         </div>
 
-                        <div className="text-center sm:text-right">
-                          <p className="text-xl sm:text-2xl font-bold text-blue-600">
-                            EGP {(item.price * item.quantity).toFixed(2)}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            EGP {item.price.toFixed(2)} each
-                          </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 bg-gray-100 rounded-lg p-1 w-full sm:w-auto justify-center">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center disabled:opacity-50"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </motion.button>
+                            <span className="w-8 text-center font-semibold">
+                              {item.quantity}
+                            </span>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                              className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </motion.button>
+                          </div>
+
+                          <div className="text-center sm:text-right">
+                            <p className="text-xl sm:text-2xl font-bold text-blue-600">
+                              EGP {(item.price * item.quantity).toFixed(2)}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              EGP {item.price.toFixed(2)} each
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -228,6 +288,10 @@ export default function CartPage() {
 
               <div className="space-y-3 mb-6 pb-6 border-b">
                 <div className="flex justify-between text-gray-700">
+                  <span>Selected Items</span>
+                  <span>{selectedIds.size} items</span>
+                </div>
+                <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
                   <span>EGP {subtotal.toFixed(2)}</span>
                 </div>
@@ -254,15 +318,22 @@ export default function CartPage() {
                 </span>
               </div>
 
-              <Link href="/site/checkout">
+              <Link href="/site/checkout" onClick={handleProceedToCheckout}>
                 <Button
                   size="lg"
-                  className="w-full rounded-xl bg-gradient-to-r text-white from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2"
+                  disabled={selectedIds.size === 0}
+                  className="w-full rounded-xl bg-gradient-to-r text-white from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 gap-2 disabled:opacity-50"
                 >
                   Proceed to Checkout
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
+
+              {selectedIds.size === 0 && (
+                <p className="text-sm text-red-500 text-center mt-2">
+                  Please select at least one item
+                </p>
+              )}
 
               <Link href="/site/shop">
                 <Button variant="ghost" className="w-full mt-3 rounded-xl">
@@ -270,7 +341,7 @@ export default function CartPage() {
                 </Button>
               </Link>
 
-              {subtotal < 3000 && (
+              {subtotal < 3000 && subtotal > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

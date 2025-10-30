@@ -31,12 +31,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-black via-purple-900 to-blue-900 text-white">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 text-gray-800 ">
       <Sidebar />
 
       <div className="flex flex-col flex-1">
-        <div className="flex justify-between items-center p-6 border-b border-white/10 backdrop-blur-md bg-white/5">
-          <h1 className="text-2xl font-semibold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+        <div className="flex justify-between items-center p-6 border-b border-white/10 backdrop-blur-md bg-gray-200">
+          <h1 className="text-3xl font-semibold bg-gradient-to-r from-purple-500 to-blue-600 bg-clip-text text-transparent">
             Admin Dashboard
           </h1>
 
@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold text-lg shadow-md">
                 {admin.name.charAt(0).toUpperCase()}
               </div>
-              <span className="text-gray-200 font-medium">{admin.name}</span>
+              <span className="text-blue-600 font-semibold ">{admin.name}</span>
             </div>
           )}
         </div>

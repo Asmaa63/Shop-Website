@@ -1,14 +1,7 @@
-// File: store/cartStore.ts
-
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Product } from '@/types/index.d'; 
-// Assuming ShippingAddress is available somewhere, or define a basic one if not
 import type { ShippingAddress } from '@/lib/validation/checkoutSchema'; 
-
-// ----------------------------------------------------
-// 1. Define the Order Type and EXPORT it
-// ----------------------------------------------------
 
 export interface Order {
     id: number; 
@@ -21,39 +14,24 @@ export interface Order {
     status: string;
 }
 
-// ----------------------------------------------------
-// 2. Define the Cart State and Actions
-// ----------------------------------------------------
-
-// NOTE: We change 'updateQuantity' to 'updateItemQuantity' to match the ProductCard component
-// and add 'getItemQuantity' (which is a Getter function)
 interface CartState {
     items: CartItem[];
     orders: Order[];
+    selectedItems: CartItem[];
     
-    // Actions
     addItem: (product: Product, quantity?: number) => void;
     removeItem: (productId: string) => void;
-    
-    // RENAMED from 'updateQuantity'
+    removeSelectedItems: () => void;
     updateItemQuantity: (productId: string, quantity: number) => void; 
-    
     clearCart: () => void;
     addOrder: (order: Order) => void;
+    setSelectedItems: (items: CartItem[]) => void;
     
-    // Getters
     totalItems: number;
     totalPrice: number;
-
-    // ADDED: The function needed by ProductCard to get the current quantity
     getItemQuantity: (productId: string) => number; 
 }
 
-// ----------------------------------------------------
-// 3. Zustand Store Implementation
-// ----------------------------------------------------
-
-// Helper function to calculate totals (improves readability)
 const calculateTotals = (items: CartItem[]) => {
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -65,19 +43,14 @@ export const useCartStore = create<CartState>()(
         (set, get) => ({
             items: [],
             orders: [],
+            selectedItems: [],
             totalItems: 0,
             totalPrice: 0,
 
-            // --- Getters Implementation (Needed for ProductCard) ---
-
-            // IMPLEMENTED: getItemQuantity 
             getItemQuantity: (productId) => {
                 const item = get().items.find(item => item._id === productId);
                 return item ? item.quantity : 0;
             },
-
-
-            // --- Actions Implementation ---
 
             addItem: (product, quantity = 1) => {
                 set((state) => {
@@ -87,7 +60,6 @@ export const useCartStore = create<CartState>()(
                     if (itemIndex > -1) {
                         newItems[itemIndex].quantity += quantity;
                     } else {
-                        // Using product._id as the identifier (as used in removeItem/updateQuantity)
                         newItems.push({ ...product, quantity, _id: product._id }); 
                     }
 
@@ -109,10 +81,21 @@ export const useCartStore = create<CartState>()(
                 });
             },
 
-            // IMPLEMENTED: updateItemQuantity (Renamed from updateQuantity)
+            removeSelectedItems: () => {
+                set((state) => {
+                    const selectedIds = new Set(state.selectedItems.map(item => item._id));
+                    const newItems = state.items.filter(item => !selectedIds.has(item._id));
+                    
+                    return { 
+                        items: newItems,
+                        selectedItems: [],
+                        ...calculateTotals(newItems) 
+                    };
+                });
+            },
+
             updateItemQuantity: (productId, quantity) => {
                 set((state) => {
-                    // Check if quantity is zero or less, then remove the item
                     if (quantity <= 0) {
                         return { 
                             items: state.items.filter(item => item._id !== productId),
@@ -120,7 +103,6 @@ export const useCartStore = create<CartState>()(
                         };
                     }
 
-                    // Update the quantity of the existing item
                     const newItems = state.items.map(item =>
                         item._id === productId ? { ...item, quantity } : item
                     );
@@ -134,6 +116,7 @@ export const useCartStore = create<CartState>()(
 
             clearCart: () => set({ 
                 items: [], 
+                selectedItems: [],
                 totalItems: 0, 
                 totalPrice: 0 
             }),
@@ -142,7 +125,9 @@ export const useCartStore = create<CartState>()(
                 set(state => ({
                     orders: [order, ...state.orders], 
                 }));
-            }
+            },
+
+            setSelectedItems: (items) => set({ selectedItems: items }),
         }),
         {
             name: 'ecommerce-cart-storage',

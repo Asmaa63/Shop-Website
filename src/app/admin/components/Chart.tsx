@@ -159,8 +159,8 @@ export default function Chart() {
                 <Cell key={`cell-${i}`} fill={STATUS_COLORS[entry.name]} />
               ))}
             </Pie>
-            <Legend />
-            <Tooltip />
+            <Legend wrapperStyle={{ color: "#E5E7EB" }} />
+            <Tooltip contentStyle={{ backgroundColor: "#1F2937", color: "#F9FAFB" }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
@@ -170,9 +170,9 @@ export default function Chart() {
         <h3 className="text-lg font-semibold mb-4 text-white/90">Sales Overview</h3>
         <ResponsiveContainer width="100%" height={250}>
           <LineChart data={salesByDate}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="date" stroke="#E5E7EB" />
+            <YAxis stroke="#E5E7EB" />
+            <Tooltip contentStyle={{ backgroundColor: "#312E81", color: "#F9FAFB" }} />
             <Line type="monotone" dataKey="total" stroke="#A5B4FC" strokeWidth={3} />
           </LineChart>
         </ResponsiveContainer>
@@ -183,9 +183,9 @@ export default function Chart() {
         <h3 className="text-lg font-semibold mb-4 text-white/90">New Users Over Time</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={usersByDate}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="date" stroke="#E5E7EB" />
+            <YAxis stroke="#E5E7EB" />
+            <Tooltip contentStyle={{ backgroundColor: "#831843", color: "#F9FAFB" }} />
             <Bar dataKey="count" fill="#F9A8D4" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -196,9 +196,9 @@ export default function Chart() {
         <h3 className="text-lg font-semibold mb-4 text-white/90">Top Selling Products</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={topProducts}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="name" stroke="#E5E7EB" />
+            <YAxis stroke="#E5E7EB" />
+            <Tooltip contentStyle={{ backgroundColor: "#064E3B", color: "#F9FAFB" }} />
             <Bar dataKey="quantity" fill="#6EE7B7" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -215,9 +215,9 @@ export default function Chart() {
                 <stop offset="95%" stopColor="#67E8F9" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="date" stroke="#E5E7EB" />
+            <YAxis stroke="#E5E7EB" />
+            <Tooltip contentStyle={{ backgroundColor: "#083344", color: "#F9FAFB" }} />
             <Area
               type="monotone"
               dataKey="revenue"
@@ -231,25 +231,24 @@ export default function Chart() {
       </div>
 
       {/* Customer Growth */}
-<div className="bg-gradient-to-br from-teal-900 to-teal-700 rounded-2xl p-6 border border-teal-600 shadow-lg lg:col-span-2">
-  <h3 className="text-lg font-semibold mb-4 text-white/90">Customer Growth</h3>
-  <ResponsiveContainer width="100%" height={250}>
-    <RadialBarChart
-  cx="50%"
-  cy="50%"
-  innerRadius="60%"
-  outerRadius="90%"
-  barSize={16}
-  data={customerGrowthData}
-  startAngle={90}
-  endAngle={-270} 
->
-      <RadialBar background dataKey="value" cornerRadius={8} />
-      <Tooltip />
-    </RadialBarChart>
-  </ResponsiveContainer>
-</div>
-
+      <div className="bg-gradient-to-br from-teal-900 to-teal-700 rounded-2xl p-6 border border-teal-600 shadow-lg lg:col-span-2">
+        <h3 className="text-lg font-semibold mb-4 text-white/90">Customer Growth</h3>
+        <ResponsiveContainer width="100%" height={250}>
+          <RadialBarChart
+            cx="50%"
+            cy="50%"
+            innerRadius="60%"
+            outerRadius="90%"
+            barSize={16}
+            data={customerGrowthData}
+            startAngle={90}
+            endAngle={-270}
+          >
+            <RadialBar background dataKey="value" cornerRadius={8} />
+            <Tooltip contentStyle={{ backgroundColor: "#042F2E", color: "#F9FAFB" }} />
+          </RadialBarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

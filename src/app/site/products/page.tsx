@@ -6,8 +6,8 @@ import type { Metadata } from "next"; // Imported Metadata type
 // --- SEO Metadata for Next.js Page (English) ---
 // This block sets the page title, description, and keywords for search engines.
 export const metadata: Metadata = {
-    title: "All Products | Shop the Latest Collections - Exclusive Store",
-    description: "Browse our complete collection of products. Find the newest trends, best sellers, and exclusive items across all categories for all your needs.",
+    title: "All Products | Shop the Latest Collections - ShopEC Store",
+    description: "Browse our complete collection of products. Find the newest trends, best sellers, and ShopEC items across all categories for all your needs.",
     keywords: ["all products", "shop online", "latest collection", "ecommerce store", "best sellers", "online shopping", "new arrivals"],
 };
 // -------------------------------------

@@ -18,13 +18,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // ✅ مقارنة الباسورد الحقيقي مع المشفر في MongoDB
     const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // ✅ لو صح، رجع بيانات الأدمن
     return NextResponse.json({
       message: "Login successful",
       admin: {
@@ -34,7 +32,6 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error in login:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

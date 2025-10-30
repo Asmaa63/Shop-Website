@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import Link from 'next/link';
 import HeroSlider from '@/components/customer/HeroSlider';
-import CategoriesGrid from '@/components/customer/CategoriesGrid';
 import FlashDeals from '@/components/customer/FlashDeals';
 import ProductCard from '@/components/customer/ProductCard';
 import productsData from '@/data/products.json';
@@ -12,9 +11,9 @@ import { Product, RawProductData } from "@/lib/types";
 // ✅ SEO METADATA FOR HOME PAGE
 // ----------------------------------------------------
 export const metadata: Metadata = {
-  title: "Exclusive Store | Shop the Best Deals on Tech, Fashion & Home Essentials",
-  description: "Welcome to Exclusive! Discover amazing flash deals, featured top-rated products, and explore essential categories. Enjoy free shipping, secure payment, and premium quality on all orders.",
-  keywords: ["exclusive store", "online shopping deals", "featured products", "flash sales", "e-commerce home"],
+  title: "ShopEC Store | Shop the Best Deals on Tech, Fashion & Home Essentials",
+  description: "Welcome to ShopEC! Discover amazing flash deals, featured top-rated products, and explore essential categories. Enjoy free shipping, secure payment, and premium quality on all orders.",
+  keywords: ["ShopEC store", "online shopping deals", "featured products", "flash sales", "e-commerce home"],
   openGraph: {
     images: ['/images/homepage-banner.jpg'], // Make sure to use an eye-catching banner image
   }
@@ -56,8 +55,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Categories Grid */}
-        <CategoriesGrid />
 
         {/* Flash Deals */}
         <FlashDeals />
@@ -132,7 +129,7 @@ export default function Home() {
               📧 Subscribe to Our Newsletter
             </h2>
             <p className="text-lg text-white opacity-90 mb-8">
-              Get the latest updates on new products and exclusive offers!
+              Get the latest updates on new products and ShopEC offers!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-xl mx-auto">
               <input

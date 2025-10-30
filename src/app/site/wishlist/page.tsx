@@ -183,7 +183,7 @@ const moveToCart = (product: any) => {
                   </h3>
 
                   {/* Rating */}
-                  <div className="flex items-center gap-1 mb-3">
+                  {/* <div className="flex items-center gap-1 mb-3">
                     {[...Array(5)].map((_, i) => (
                       <motion.span
                         key={i}
@@ -195,7 +195,7 @@ const moveToCart = (product: any) => {
                       </motion.span>
                     ))}
                     <span className="text-sm text-gray-600 ml-1">(4.5)</span>
-                  </div>
+                  </div> */}
 
                   {/* Price */}
                   <div className="flex items-center justify-between mb-4">

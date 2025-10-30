@@ -1,5 +1,3 @@
-// File: components/checkout/CheckoutForm.tsx
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -7,13 +5,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toaster, toast } from 'sonner';
 import { CheckoutFormInputs, CheckoutFormSchema, ShippingAddress } from '@/lib/validation/checkoutSchema';
 import { useCartStore, Order } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { CartItem } from '@/types/index.d';
+import { getGovernoratesList, getCitiesByGovernorate } from '@/lib/egyptianLocations';
 
 const createOrderObject = (
   data: CheckoutFormInputs,
@@ -36,22 +36,40 @@ const createOrderObject = (
 export default function CheckoutForm() {
   const router = useRouter();
 
-  const { items, totalPrice, addOrder, clearCart } = useCartStore(state => ({
-    items: state.items,
-    totalPrice: state.totalPrice,
+  const { selectedItems, addOrder, removeSelectedItems } = useCartStore(state => ({
+    selectedItems: state.selectedItems,
     addOrder: state.addOrder,
-    clearCart: state.clearCart,
+    removeSelectedItems: state.removeSelectedItems,
   }));
 
-  const shippingCost = 50.0;
+  const [selectedGovernorate, setSelectedGovernorate] = useState<string>('');
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+
+  const governorates = getGovernoratesList();
+
+  const itemsTotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+  let shippingCost = 0;
+  if (itemsTotal > 0 && itemsTotal < 2000) {
+    shippingCost = 70;
+  } else if (itemsTotal >= 2000 && itemsTotal < 3000) {
+    shippingCost = 50;
+  } else if (itemsTotal >= 3000) {
+    shippingCost = 0;
+  }
+
+  const totalPrice = itemsTotal + shippingCost;
 
   const form = useForm<CheckoutFormInputs>({
     resolver: zodResolver(CheckoutFormSchema),
     defaultValues: {
       address: {
         fullName: '',
-        street: '',
+        email: '',
+        governorate: '',
         city: '',
+        street: '',
+        village: '',
         zipCode: '',
         country: 'Egypt',
         phone: '',
@@ -70,68 +88,86 @@ export default function CheckoutForm() {
 
   const paymentMethod = watch('paymentMethod');
 
+  useEffect(() => {
+    if (selectedGovernorate) {
+      const cities = getCitiesByGovernorate(selectedGovernorate);
+      setAvailableCities(cities);
+      setValue('address.city', '');
+    }
+  }, [selectedGovernorate, setValue]);
+
   const onSubmit = async (data: CheckoutFormInputs) => {
-  if (items.length === 0) {
+  if (selectedItems.length === 0) {
     toast.error('Your cart is empty. Please add some items first.');
     return;
   }
 
-  const order: Order = createOrderObject(data, items, totalPrice, shippingCost);
+  const order: Order = createOrderObject(data, selectedItems, itemsTotal, shippingCost);
 
   if (data.paymentMethod === 'cod') {
-  try {
-    // ✅ نحفظ الطلب في MongoDB عبر /api/orders
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: "guest", // أو session?.user?.id لو عندك NextAuth
-        items,
-        shippingAddress: data.address,
-        totalAmount: totalPrice + shippingCost,
-        status: "Pending",
-      }),
-    });
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "guest",
+          items: selectedItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            image: item.imageUrl || item.image,
+          })),
+          shippingAddress: {
+            fullName: data.address.fullName,
+            email: data.address.email,
+            phone: data.address.phone,
+            governorate: data.address.governorate,
+            city: data.address.city,
+            street: data.address.street,
+            village: data.address.village || '',
+            zipCode: data.address.zipCode,
+            country: data.address.country || 'Egypt',
+          },
+          totalAmount: totalPrice,
+          status: "Pending",
+        }),
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok) {
-      console.error("Failed to save order:", result);
-      toast.error("Failed to save order to the database.");
-      return;
+      if (!response.ok) {
+        console.error("Failed to save order:", result);
+        toast.error("Failed to save order to the database.");
+        return;
+      }
+
+      addOrder(order);
+      removeSelectedItems();
+
+      toast.success("Your order has been placed successfully! You will pay on delivery.");
+
+      setTimeout(() => {
+        router.push(`/site/order-confirmation?orderId=${result.orderId}`);
+      }, 1000);
+    } catch (err) {
+      console.error("Error saving COD order:", err);
+      toast.error("An unexpected error occurred while saving your order.");
     }
 
-    // ✅ نحفظه كمان محلياً (عشان يظهر في My Orders)
-    addOrder(order);
-    clearCart();
-
-    toast.success("Your order has been placed successfully! You will pay on delivery.");
-
-    // ✅ تحويل للصفحة مع رقم الطلب
-    setTimeout(() => {
-      router.push(`/site/order-confirmation?orderId=${result.orderId}`);
-    }, 1000);
-  } catch (err) {
-    console.error("Error saving COD order:", err);
-    toast.error("An unexpected error occurred while saving your order.");
+    return;
   }
-
-  return;
-}
-
 
   toast.loading('Processing payment... Please wait.');
 
   try {
-    // ✅ Save cart and shipping info before redirect
-    localStorage.setItem("cartItems", JSON.stringify(items));
+    localStorage.setItem("cartItems", JSON.stringify(selectedItems));
     localStorage.setItem("shippingAddress", JSON.stringify(data.address));
 
     const response = await fetch('/api/payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        items: items,
+        items: selectedItems,
         shippingAddress: data.address as ShippingAddress,
         orderData: order,
       }),
@@ -153,7 +189,6 @@ export default function CheckoutForm() {
   }
 };
 
-
   return (
     <motion.div
       className="max-w-xl mx-auto p-8 bg-white shadow-2xl rounded-2xl mt-10 border border-gray-100"
@@ -173,29 +208,84 @@ export default function CheckoutForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <Label htmlFor="fullName">Full Name</Label>
-          <Input id="fullName" placeholder="Ahmed Mohamed" {...register('address.fullName')} />
+          <Input id="fullName" placeholder="Your name" {...register('address.fullName')} />
           {errors.address?.fullName && (
             <p className="text-sm text-red-500 mt-1">{errors.address.fullName.message}</p>
           )}
         </div>
 
         <div>
-          <Label htmlFor="street">Street Address</Label>
-          <Input id="street" placeholder="Tahrir Street, Dokki" {...register('address.street')} />
-          {errors.address?.street && (
-            <p className="text-sm text-red-500 mt-1">{errors.address.street.message}</p>
+          <Label htmlFor="email">Email Address</Label>
+          <Input id="email" type="email" placeholder="email@example.com" {...register('address.email')} />
+          {errors.address?.email && (
+            <p className="text-sm text-red-500 mt-1">{errors.address.email.message}</p>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
+            <Label htmlFor="governorate">Governorate</Label>
+            <Select
+              value={selectedGovernorate}
+              onValueChange={(value) => {
+                setSelectedGovernorate(value);
+                setValue('address.governorate', value);
+              }}
+            >
+              <SelectTrigger id="governorate">
+                <SelectValue placeholder="Select Governorate" />
+              </SelectTrigger>
+              <SelectContent className='bg-gray-300'>
+                {governorates.map((gov) => (
+                  <SelectItem key={gov} value={gov}>
+                    {gov}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.address?.governorate && (
+              <p className="text-sm text-red-500 mt-1">{errors.address.governorate.message}</p>
+            )}
+          </div>
+
+          <div>
             <Label htmlFor="city">City</Label>
-            <Input id="city" placeholder="Cairo" {...register('address.city')} />
+            <Select
+              value={watch('address.city')}
+              onValueChange={(value) => setValue('address.city', value)}
+              disabled={!selectedGovernorate}
+            >
+              <SelectTrigger id="city">
+                <SelectValue placeholder="Select City" />
+              </SelectTrigger>
+              <SelectContent className='bg-gray-300'>
+                {availableCities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.address?.city && (
               <p className="text-sm text-red-500 mt-1">{errors.address.city.message}</p>
             )}
           </div>
+        </div>
 
+        <div>
+          <Label htmlFor="street">Street Address</Label>
+          <Input id="street" placeholder="123 Main Street, Building 5, Floor 2" {...register('address.street')} />
+          {errors.address?.street && (
+            <p className="text-sm text-red-500 mt-1">{errors.address.street.message}</p>
+          )}
+        </div>
+
+        <div>
+          <Label htmlFor="village">Village / Area (Optional)</Label>
+          <Input id="village" placeholder="Village or Area name" {...register('address.village')} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="zipCode">Zip Code</Label>
             <Input id="zipCode" placeholder="11511" {...register('address.zipCode')} />
@@ -203,14 +293,14 @@ export default function CheckoutForm() {
               <p className="text-sm text-red-500 mt-1">{errors.address.zipCode.message}</p>
             )}
           </div>
-        </div>
 
-        <div>
-          <Label htmlFor="country">Country</Label>
-          <Input id="country" placeholder="Egypt" {...register('address.country')} />
-          {errors.address?.country && (
-            <p className="text-sm text-red-500 mt-1">{errors.address.country.message}</p>
-          )}
+          <div>
+            <Label htmlFor="country">Country</Label>
+            <Input id="country" placeholder="Egypt" {...register('address.country')} disabled />
+            {errors.address?.country && (
+              <p className="text-sm text-red-500 mt-1">{errors.address.country.message}</p>
+            )}
+          </div>
         </div>
 
         <div>
