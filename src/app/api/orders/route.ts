@@ -9,25 +9,16 @@ export async function GET() {
     await connectDB();
     const session = await getServerSession(authOptions);
 
-    let orders;
-
-    // ✅ لو في admin أو dashboard: رجّع كل الطلبات
-    if (!session || session.user?.email === "admin@gmail.com") {
-      orders = await Order.find({}).sort({ createdAt: -1 });
-    } else {
-      // ✅ لو مستخدم عادي: رجّع طلباته فقط
-      orders = await Order.find({ "user.email": session.user.email }).sort({
-        createdAt: -1,
-      });
+    if (!session || !session.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const orders = await Order.find({ "user.email": session.user.email }).sort({ createdAt: -1 });
 
     return NextResponse.json({ orders });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return NextResponse.json(
-      { message: "Failed to fetch orders" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Failed to fetch orders" }, { status: 500 });
   }
 }
 
@@ -35,22 +26,17 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const session = await getServerSession(authOptions);
+    console.log("Session user =>", session?.user);
 
     const body = await request.json();
     const { items, shippingAddress, totalAmount, status } = body;
 
     if (!items || items.length === 0) {
-      return NextResponse.json(
-        { message: "Items are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Items are required" }, { status: 400 });
     }
 
     if (!shippingAddress) {
-      return NextResponse.json(
-        { message: "Shipping address is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Shipping address is required" }, { status: 400 });
     }
 
     const newOrder = await Order.create({
@@ -72,9 +58,9 @@ export async function POST(request: NextRequest) {
         governorate: shippingAddress.governorate,
         city: shippingAddress.city,
         street: shippingAddress.street,
-        village: shippingAddress.village || "",
+        village: shippingAddress.village || '',
         zipCode: shippingAddress.zipCode,
-        country: shippingAddress.country || "Egypt",
+        country: shippingAddress.country || 'Egypt',
       },
       totalAmount,
       status: status || "Pending",
@@ -82,18 +68,11 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      {
-        message: "Order created successfully",
-        orderId: newOrder._id,
-        order: newOrder,
-      },
+      { message: "Order created successfully", orderId: newOrder._id, order: newOrder },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error creating order:", error);
-    return NextResponse.json(
-      { message: "Failed to create order" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Failed to create order" }, { status: 500 });
   }
 }
