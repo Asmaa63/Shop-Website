@@ -69,15 +69,23 @@ function Chart() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/orders").then((res) => res.json()).catch(() => []),
+      fetch("/api/orders").then((res) => res.json()).catch(() => ({ orders: [] })),
       fetch("/api/users-admins").then((res) => res.json()).catch(() => []),
       fetch("https://68f0b6520b966ad50033e04c.mockapi.io/ecommerce/products")
         .then((res) => res.json())
         .catch(() => []),
     ]).then(([ordersData, usersData, productsData]) => {
-      setOrders(Array.isArray(ordersData) ? ordersData : ordersData?.orders || []);
+      const orders = (Array.isArray(ordersData) ? ordersData : ordersData?.orders || []).map((order: any) => ({
+        ...order,
+        id: order._id || order.id,
+      }));
+      
+      setOrders(orders);
       setUsers(Array.isArray(usersData) ? usersData : usersData?.users || []);
       setProducts(Array.isArray(productsData) ? productsData : productsData?.products || []);
+      
+      console.log("Orders loaded:", orders.length);
+      console.log("Orders data:", orders);
     });
   }, []);
 
@@ -150,32 +158,29 @@ function Chart() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 text-white">
-      {/* Orders Status */}
       <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 border border-slate-700 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-white/90">Orders Status</h3>
         <ResponsiveContainer width="100%" height={300}>
-  <PieChart>
-    <Pie data={orderStatusData} dataKey="value" nameKey="name" label>
-      {orderStatusData.map((entry, i) => (
-        <Cell key={`cell-${i}`} fill={STATUS_COLORS[entry.name]} />
-      ))}
-    </Pie>
-    <Legend wrapperStyle={{ color: "#E5E7EB" }} />
-    <Tooltip
-      contentStyle={{
-        backgroundColor: "#1E293B",
-        borderRadius: "8px",
-        border: "1px solid #334155",
-      }}
-      itemStyle={{ color: "#FFFFFF" }}
-      labelStyle={{ color: "#FFFFFF" }}
-    />
-  </PieChart>
-</ResponsiveContainer>
-
+          <PieChart>
+            <Pie data={orderStatusData} dataKey="value" nameKey="name" label>
+              {orderStatusData.map((entry, i) => (
+                <Cell key={`cell-${i}`} fill={STATUS_COLORS[entry.name]} />
+              ))}
+            </Pie>
+            <Legend wrapperStyle={{ color: "#E5E7EB" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1E293B",
+                borderRadius: "8px",
+                border: "1px solid #334155",
+              }}
+              itemStyle={{ color: "#FFFFFF" }}
+              labelStyle={{ color: "#FFFFFF" }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
 
-      {/* Sales Overview */}
       <div className="bg-gradient-to-br from-indigo-900 to-indigo-700 rounded-2xl p-6 border border-indigo-600 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-white/90">Sales Overview</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -188,7 +193,6 @@ function Chart() {
         </ResponsiveContainer>
       </div>
 
-      {/* Users Growth */}
       <div className="bg-gradient-to-br from-pink-900 to-pink-700 rounded-2xl p-6 border border-pink-600 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-white/90">New Users Over Time</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -201,7 +205,6 @@ function Chart() {
         </ResponsiveContainer>
       </div>
 
-      {/* Top Products */}
       <div className="bg-gradient-to-br from-emerald-900 to-emerald-700 rounded-2xl p-6 border border-emerald-600 shadow-lg">
         <h3 className="text-lg font-semibold mb-4 text-white/90">Top Selling Products</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -214,7 +217,6 @@ function Chart() {
         </ResponsiveContainer>
       </div>
 
-      {/* Revenue vs Orders */}
       <div className="bg-gradient-to-br from-cyan-900 to-cyan-700 rounded-2xl p-6 border border-cyan-600 shadow-lg lg:col-span-2">
         <h3 className="text-lg font-semibold mb-4 text-white/90">Revenue vs Orders</h3>
         <ResponsiveContainer width="100%" height={350}>
@@ -240,7 +242,6 @@ function Chart() {
         </ResponsiveContainer>
       </div>
 
-      {/* Customer Growth */}
       <div className="bg-gradient-to-br from-teal-900 to-teal-700 rounded-2xl p-6 border border-teal-600 shadow-lg lg:col-span-2">
         <h3 className="text-lg font-semibold mb-4 text-white/90">Customer Growth</h3>
         <ResponsiveContainer width="100%" height={300}>

@@ -13,9 +13,25 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const orders = await Order.find({ "user.email": session.user.email }).sort({ createdAt: -1 });
+    const isAdmin = session.user.email === "asmaasharf123@gmail.com";
 
-    return NextResponse.json({ orders });
+    let orders;
+    
+    if (isAdmin) {
+      orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+    } else {
+      orders = await Order.find({ "user.email": session.user.email }).sort({ createdAt: -1 }).lean();
+    }
+
+    const transformedOrders = orders.map(order => ({
+      ...order,
+      id: order._id.toString(),
+    }));
+
+    console.log(`Fetching orders for ${session.user.email} (Admin: ${isAdmin})`);
+    console.log(`Total orders found: ${transformedOrders.length}`);
+
+    return NextResponse.json({ orders: transformedOrders });
   } catch (error) {
     console.error("Error fetching orders:", error);
     return NextResponse.json({ message: "Failed to fetch orders" }, { status: 500 });
