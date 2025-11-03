@@ -69,12 +69,11 @@ function Chart() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/orders").then((res) => res.json()).catch(() => ({ orders: [] })),
-      fetch("/api/users-admins").then((res) => res.json()).catch(() => []),
-      fetch("https://68f0b6520b966ad50033e04c.mockapi.io/ecommerce/products")
-        .then((res) => res.json())
-        .catch(() => []),
-    ]).then(([ordersData, usersData, productsData]) => {
+  fetch("/api/orders/admin", { cache: "no-store" }).then((res) => res.json()).catch(() => []),
+  fetch("/api/users-admins", { cache: "no-store" }).then((res) => res.json()).catch(() => []),
+  fetch("/api/products", { cache: "no-store" }).then((res) => res.json()).catch(() => []),
+])
+.then(([ordersData, usersData, productsData]) => {
       const orders = (Array.isArray(ordersData) ? ordersData : ordersData?.orders || []).map((order: any) => ({
         ...order,
         id: order._id || order.id,

@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ShoppingBag, Users, Package, CircleDollarSign } from "lucide-react";
 import Chart from "../components/Chart";
-import StatsCard from "../components/StatsCard";
-import { BarChart3, ArrowRight } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 
 interface OrderItem {
   name: string;

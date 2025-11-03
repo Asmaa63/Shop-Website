@@ -19,6 +19,19 @@ export async function GET() {
     
     if (isAdmin) {
       orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+      console.log("🔍 ALL ORDERS FROM DATABASE:");
+      console.log("Total orders in DB:", orders.length);
+      orders.forEach((order, index) => {
+        console.log(`Order ${index + 1}:`, {
+          id: order._id,
+          userEmail: order.user?.email || order.email || 'NO EMAIL',
+          status: order.status,
+          totalAmount: order.totalAmount,
+          createdAt: order.createdAt,
+          hasItems: !!order.items,
+          itemsCount: order.items?.length || 0
+        });
+      });
     } else {
       orders = await Order.find({ "user.email": session.user.email }).sort({ createdAt: -1 }).lean();
     }
@@ -28,12 +41,12 @@ export async function GET() {
       id: order._id.toString(),
     }));
 
-    console.log(`Fetching orders for ${session.user.email} (Admin: ${isAdmin})`);
-    console.log(`Total orders found: ${transformedOrders.length}`);
+    console.log(`✅ Fetching orders for ${session.user.email} (Admin: ${isAdmin})`);
+    console.log(`✅ Total orders returned: ${transformedOrders.length}`);
 
     return NextResponse.json({ orders: transformedOrders });
   } catch (error) {
-    console.error("Error fetching orders:", error);
+    console.error("❌ Error fetching orders:", error);
     return NextResponse.json({ message: "Failed to fetch orders" }, { status: 500 });
   }
 }
