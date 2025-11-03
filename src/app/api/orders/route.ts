@@ -4,6 +4,24 @@ import Order from "@/models/Order";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+interface OrderItemInput {
+  name: string;
+  quantity: number;
+  price: number;
+  image?: string;
+  imageUrl?: string;
+}
+
+interface LeanOrder {
+  _id: string | { toString(): string };
+  status: string;
+  totalAmount: number;
+  createdAt: Date;
+  items?: { name: string; quantity: number; price: number; image?: string }[];
+  user?: { email?: string };
+  email?: string;
+}
+
 export async function GET() {
   try {
     await connectDB();
@@ -14,11 +32,12 @@ export async function GET() {
     }
 
     const isAdmin = session.user.email === "asmaasharf123@gmail.com";
-
-    let orders;
+    let orders: LeanOrder[] = [];
     
     if (isAdmin) {
-      orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+      orders = (await Order.find({})
+  .sort({ createdAt: -1 })
+  .lean()) as unknown as LeanOrder[];
       console.log("🔍 ALL ORDERS FROM DATABASE:");
       console.log("Total orders in DB:", orders.length);
       orders.forEach((order, index) => {
@@ -33,12 +52,14 @@ export async function GET() {
         });
       });
     } else {
-      orders = await Order.find({ "user.email": session.user.email }).sort({ createdAt: -1 }).lean();
+      orders = (await Order.find({ "user.email": session.user.email })
+  .sort({ createdAt: -1 })
+  .lean()) as unknown as LeanOrder[];
     }
 
-    const transformedOrders = orders.map(order => ({
+   const transformedOrders = orders.map((order) => ({
       ...order,
-      id: order._id.toString(),
+      id: typeof order._id === "string" ? order._id : order._id.toString(),
     }));
 
     console.log(`✅ Fetching orders for ${session.user.email} (Admin: ${isAdmin})`);
@@ -74,12 +95,12 @@ export async function POST(request: NextRequest) {
         name: session?.user?.name || "Guest User",
         email: session?.user?.email || "guest@example.com",
       },
-      items: items.map((item: any) => ({
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        image: item.imageUrl || item.image,
-      })),
+      items: items.map((item: OrderItemInput) => ({
+  name: item.name,
+  quantity: item.quantity,
+  price: item.price,
+  image: item.imageUrl || item.image,
+})),
       shippingAddress: {
         fullName: shippingAddress.fullName,
         email: shippingAddress.email,

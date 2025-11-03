@@ -231,7 +231,6 @@ export default function AddProductModal({
       className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4"
       onClick={onClose}
     >
-      <Toaster position="top-right" />
 
       <motion.div
         onClick={(e) => e.stopPropagation()}

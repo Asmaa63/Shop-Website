@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Edit, Trash2, X } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
+import { Edit, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 type Product = {
   id: string;
@@ -25,8 +24,6 @@ export default function ProductCard({
   product: Product;
   onDelete: () => void;
 }) {
-  const [toasts, setToasts] = useState<string[]>([]);
-
   const handleDelete = async () => {
     const confirmed = await new Promise((resolve) => {
       toast(
@@ -76,27 +73,8 @@ export default function ProductCard({
 
       if (!res.ok) throw new Error("Failed to delete");
 
-      const successToast = toast.custom(
-        (t) => (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="flex items-center justify-between bg-green-500 text-white px-4 py-3 rounded-lg shadow-md w-full max-w-sm"
-          >
-            <span>Product deleted successfully!</span>
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="ml-3 p-1 hover:bg-green-600 rounded-full transition"
-            >
-              <X size={16} />
-            </button>
-          </motion.div>
-        ),
-        { duration: 3000, id: loadingToast }
-      );
-
-      setToasts([...toasts, successToast?.toString() || ""]);
+      toast.dismiss(loadingToast);
+      toast.success("Product deleted successfully!", { duration: 3000 });
       onDelete();
     } catch (error) {
       toast.error("Failed to delete product", { id: loadingToast });
@@ -104,98 +82,95 @@ export default function ProductCard({
   };
 
   return (
-    <>
-      <Toaster position="top-center" />
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -8, scale: 1.02 }}
-        transition={{ duration: 0.3 }}
-        className="bg-white/5 rounded-2xl overflow-hidden shadow-md border border-white/10 hover:shadow-2xl hover:border-purple-500/50"
-      >
-        <div className="relative h-44 bg-gradient-to-br from-purple-800 to-blue-800">
-          {product.image ? (
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-300">
-              No image
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white/5 rounded-2xl overflow-hidden shadow-md border border-white/10 hover:shadow-2xl hover:border-purple-500/50"
+    >
+      <div className="relative h-44 bg-gradient-to-br from-purple-800 to-blue-800">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-300">
+            No image
+          </div>
+        )}
+
+        {product.inStock === false ? (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded font-semibold"
+          >
+            Out of stock
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-3 left-3 bg-green-600 text-white text-xs px-2 py-1 rounded font-semibold"
+          >
+            In stock
+          </motion.div>
+        )}
+      </div>
+
+      <div className="p-4">
+        <h3 className="font-semibold text-lg truncate text-black">
+          {product.name}
+        </h3>
+        <p className="text-sm text-gray-600 mt-1 truncate">{product.brand}</p>
+
+        <div className="mt-3 flex items-center justify-between">
+          <div>
+            <div className="text-xl font-bold text-green-600">
+              EGP {product.price}
             </div>
-          )}
-
-          {product.inStock === false ? (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute top-3 left-3 bg-red-600 text-white text-xs px-2 py-1 rounded font-semibold"
-            >
-              Out of stock
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute top-3 left-3 bg-green-600 text-white text-xs px-2 py-1 rounded font-semibold"
-            >
-              In stock
-            </motion.div>
-          )}
-        </div>
-
-        <div className="p-4">
-          <h3 className="font-semibold text-lg truncate text-black">
-            {product.name}
-          </h3>
-          <p className="text-sm text-gray-600 mt-1 truncate">{product.brand}</p>
-
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <div className="text-xl font-bold text-green-600">
-                EGP {product.price}
+            {product.originalPrice && (
+              <div className="text-sm line-through text-gray-700">
+                EGP {product.originalPrice}
               </div>
-              {product.originalPrice && (
-                <div className="text-sm line-through text-gray-700">
-                  EGP {product.originalPrice}
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Link href={`/admin/products/${product.id}`}>
-                <motion.button
-                  whileHover={{ scale: 1.1, rotate: 10 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-md bg-blue-600/10 hover:bg-blue-600/20 transition-all"
-                  title="Edit"
-                >
-                  <Edit size={18} className="text-blue-500" />
-                </motion.button>
-              </Link>
-              <motion.button
-                whileHover={{ scale: 1.1, rotate: -10 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleDelete}
-                className="p-2 rounded-md bg-red-600/10 hover:bg-red-600/20 transition-all"
-                title="Delete"
-              >
-                <Trash2 size={18} className="text-red-500" />
-              </motion.button>
-            </div>
+            )}
           </div>
 
-          <div className="mt-3 text-xs text-gray-300 flex items-center justify-between">
-            <span className="px-2 py-1 bg-purple-400 rounded">
-              {product.category}
-            </span>
-            <span className="px-2 py-1 bg-blue-400 rounded">
-              {product.subcategory}
-            </span>
+          <div className="flex items-center gap-2">
+            <Link href={`/admin/products/${product.id}`}>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 10 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-md bg-blue-600/10 hover:bg-blue-600/20 transition-all"
+                title="Edit"
+              >
+                <Edit size={18} className="text-blue-500" />
+              </motion.button>
+            </Link>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: -10 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleDelete}
+              className="p-2 rounded-md bg-red-600/10 hover:bg-red-600/20 transition-all"
+              title="Delete"
+            >
+              <Trash2 size={18} className="text-red-500" />
+            </motion.button>
           </div>
         </div>
-      </motion.div>
-    </>
+
+        <div className="mt-3 text-xs text-gray-300 flex items-center justify-between">
+          <span className="px-2 py-1 bg-purple-400 rounded">
+            {product.category}
+          </span>
+          <span className="px-2 py-1 bg-blue-400 rounded">
+            {product.subcategory}
+          </span>
+        </div>
+      </div>
+    </motion.div>
   );
 }

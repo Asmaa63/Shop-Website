@@ -74,10 +74,11 @@ function Chart() {
   fetch("/api/products", { cache: "no-store" }).then((res) => res.json()).catch(() => []),
 ])
 .then(([ordersData, usersData, productsData]) => {
-      const orders = (Array.isArray(ordersData) ? ordersData : ordersData?.orders || []).map((order: any) => ({
-        ...order,
-        id: order._id || order.id,
-      }));
+      const orders = (Array.isArray(ordersData) ? ordersData : ordersData?.orders || [])
+  .map((order: Partial<Order> & { _id?: string }) => ({
+    ...order,
+    id: order._id || order.id || "",
+  })) as Order[];
       
       setOrders(orders);
       setUsers(Array.isArray(usersData) ? usersData : usersData?.users || []);

@@ -20,7 +20,7 @@ const links = [
   { href: "/admin/home", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { href: "/admin/products", label: "Products", icon: <Package size={20} /> },
   { href: "/admin/orders", label: "Orders", icon: <ShoppingBag size={20} /> },
-  { href: "/admin/users", label: "Users", icon: <Users size={20} /> },
+  { href: "/admin/users", label: "Customers", icon: <Users size={20} /> },
   { href: "/admin/messages", label: "Messages", icon: <MessageSquare size={20} /> },
   { href: "/admin/settings", label: "Settings", icon: <Settings size={20} /> },
 ];

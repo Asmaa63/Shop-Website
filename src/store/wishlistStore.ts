@@ -1,63 +1,77 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
 
-interface WishlistItem {
+type Product = {
   id: string;
   name: string;
   price: number;
   originalPrice?: number;
   image: string;
-  category: string;
-  brand?: string;
+  category?: string;
   discount?: number;
-}
+  inStock?: boolean;
+  stock?: number;
+};
 
 interface WishlistStore {
-  items: WishlistItem[];
-  addItem: (item: WishlistItem) => void;
-  removeItem: (id: string) => void;
-  clearWishlist: () => void;
-  isInWishlist: (id: string) => boolean;
-  toggleItem: (item: WishlistItem) => void;
+  items: Product[];
+  fetchWishlist: (userId: string) => Promise<void>;
+  addItem: (userId: string, product: Product) => Promise<void>;
+  removeItem: (userId: string, productId: string) => Promise<void>;
+  clearWishlist: (userId: string) => Promise<void>;
+  isInWishlist: (productId: string) => boolean;
+  toggleItem: (product: Product) => void; // 👈 أضفناها هنا
 }
 
-export const useWishlistStore = create<WishlistStore>()(
-  persist(
-    (set, get) => ({
-      items: [],
+export const useWishlistStore = create<WishlistStore>((set, get) => ({
+  items: [],
 
-      addItem: (item) => {
-        const items = get().items;
-        const exists = items.find((i) => i.id === item.id);
+  fetchWishlist: async (userId) => {
+    const res = await fetch(`/api/wishlist?userId=${userId}`);
+    const data = await res.json();
+    set({ items: data.items || [] });
+  },
 
-        if (!exists) {
-          set({ items: [...items, item] });
-        }
-      },
+  addItem: async (userId, product) => {
+    await fetch("/api/wishlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, product }),
+    });
+    set((state) => ({ items: [...state.items, product] }));
+  },
 
-      removeItem: (id) => {
-        set({ items: get().items.filter((item) => item.id !== id) });
-      },
+  removeItem: async (userId, productId) => {
+    await fetch("/api/wishlist", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, productId }),
+    });
+    set((state) => ({
+      items: state.items.filter((p) => p.id !== productId),
+    }));
+  },
 
-      clearWishlist: () => {
-        set({ items: [] });
-      },
+  clearWishlist: async (userId) => {
+    await fetch("/api/wishlist/clear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    set({ items: [] });
+  },
 
-      isInWishlist: (id) => {
-        return get().items.some((item) => item.id === id);
-      },
+  isInWishlist: (productId) => {
+    const { items } = get();
+    return items.some((p) => p.id === productId);
+  },
 
-      toggleItem: (item) => {
-        const isInWishlist = get().isInWishlist(item.id);
-        if (isInWishlist) {
-          get().removeItem(item.id);
-        } else {
-          get().addItem(item);
-        }
-      },
-    }),
-    {
-      name: 'wishlist-storage',
+  // ✅ الدالة اللي كانت ناقصة
+  toggleItem: (product) => {
+    const { items, isInWishlist } = get();
+    if (isInWishlist(product.id)) {
+      set({ items: items.filter((p) => p.id !== product.id) });
+    } else {
+      set({ items: [...items, product] });
     }
-  )
-);
+  },
+}));

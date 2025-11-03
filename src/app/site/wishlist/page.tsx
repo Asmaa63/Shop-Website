@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, ShoppingCart, Trash2, Share2, ArrowRight } from "lucide-react";
+import { Heart, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useCartStore } from "@/store/cartStore";
@@ -9,15 +9,15 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 export default function WishlistPage() {
+  const userId = "guest"; // Replace with actual user ID from auth context/store
   const { items, removeItem, clearWishlist } = useWishlistStore();
   const { addItem } = useCartStore();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const moveToCart = (product: any) => {
-  addItem(product);
-  removeItem(product.id);
-  toast.success(`EGP{product.name} added to cart!`);
-};
+  const moveToCart = (product: any) => {
+    addItem(product);
+    removeItem(userId, product.id);
+    toast.success(`${product.name} added to cart!`);
+  };
 
   const shareWishlist = () => {
     if (navigator.share) {
@@ -83,11 +83,18 @@ const moveToCart = (product: any) => {
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={clearWishlist}
+              onClick={() => clearWishlist(userId)}
               className="rounded-full gap-2 text-red-600 border-red-200 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
               Clear All
+            </Button>
+            <Button
+              variant="outline"
+              onClick={shareWishlist}
+              className="rounded-full gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+            >
+              Share Wishlist
             </Button>
           </div>
         </motion.div>
@@ -98,11 +105,7 @@ const moveToCart = (product: any) => {
           animate="show"
           variants={{
             hidden: {},
-            show: {
-              transition: {
-                staggerChildren: 0.1,
-              },
-            },
+            show: { transition: { staggerChildren: 0.1 } },
           }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
@@ -119,7 +122,6 @@ const moveToCart = (product: any) => {
                 whileHover={{ y: -10 }}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden group"
               >
-                {/* Product Image */}
                 <div className="relative h-64 bg-gray-100 overflow-hidden">
                   <Image
                     src={item.image}
@@ -128,7 +130,6 @@ const moveToCart = (product: any) => {
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
 
-                  {/* Quick Actions Overlay */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
@@ -145,14 +146,13 @@ const moveToCart = (product: any) => {
                     <motion.button
                       whileHover={{ scale: 1.1, rotate: 10 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(userId, item.id)}
                       className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 shadow-lg"
                     >
                       <Trash2 className="w-5 h-5" />
                     </motion.button>
                   </motion.div>
 
-                  {/* Discount Badge */}
                   {item.discount && (
                     <motion.div
                       initial={{ scale: 0, rotate: -45 }}
@@ -164,7 +164,6 @@ const moveToCart = (product: any) => {
                     </motion.div>
                   )}
 
-                  {/* Favorite Badge */}
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -175,29 +174,12 @@ const moveToCart = (product: any) => {
                   </motion.div>
                 </div>
 
-                {/* Product Details */}
                 <div className="p-5">
                   <p className="text-sm text-gray-500 mb-1">{item.category}</p>
                   <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2">
                     {item.name}
                   </h3>
 
-                  {/* Rating */}
-                  {/* <div className="flex items-center gap-1 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <motion.span
-                        key={i}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.1 + i * 0.05 }}
-                      >
-                        ⭐
-                      </motion.span>
-                    ))}
-                    <span className="text-sm text-gray-600 ml-1">(4.5)</span>
-                  </div> */}
-
-                  {/* Price */}
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <span className="text-2xl font-bold text-blue-600">
@@ -211,7 +193,6 @@ const moveToCart = (product: any) => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex gap-2">
                     <Button
                       onClick={() => moveToCart(item)}
@@ -223,7 +204,7 @@ const moveToCart = (product: any) => {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(userId, item.id)}
                       className="rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -235,7 +216,6 @@ const moveToCart = (product: any) => {
           </AnimatePresence>
         </motion.div>
 
-        {/* Continue Shopping */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -243,11 +223,7 @@ const moveToCart = (product: any) => {
           className="text-center mt-12"
         >
           <Link href="/site/shop">
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full px-8 gap-2 border-2"
-            >
+            <Button size="lg" variant="outline" className="rounded-full px-8 gap-2 border-2">
               Continue Shopping
               <ArrowRight className="w-5 h-5" />
             </Button>
